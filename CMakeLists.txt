@@ -6,7 +6,7 @@ SET(CMAKE_TOOLCHAIN_FILE ${STM32_PLATFORM_TOP}/cmake/toolchain-arm-none-eabi.cma
 
 INCLUDE(${STM32_PLATFORM_TOP}/cmake/board-config-${STM32_PLATFORM_BOARD_NAME}.cmake)
 
-INCLUDE(${STM32_PLATFORM_TOP}/cmake/Generic-GCC.cmake)
+INCLUDE(${STM32_PLATFORM_TOP}/cmake/generic-gcc.cmake)
 
 PROJECT(hello)
 
