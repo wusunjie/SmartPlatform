@@ -5,9 +5,3 @@ SET(CMAKE_TOOLCHAIN_FILE ${STM32_PLATFORM_TOP}/cmake/toolchain-arm-none-eabi.cma
 INCLUDE(${STM32_PLATFORM_TOP}/cmake/board-config-${STM32_PLATFORM_BOARD_NAME}.cmake)
 
 INCLUDE(${STM32_PLATFORM_TOP}/cmake/generic-gcc.cmake)
-
-# PROJECT(hello)
-
-# LIST(APPEND SRC_LIST helloworld.c)
-
-# ADD_EXECUTABLE(hello ${SRC_LIST})
