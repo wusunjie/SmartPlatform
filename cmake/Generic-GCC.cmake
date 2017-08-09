@@ -13,5 +13,5 @@ else()
     )
 endif()
 
-SET(CMAKE_EXE_LINKER_FLAGS "--specs=nosys.specs" CACHE INTERNAL "")
+SET(CMAKE_EXE_LINKER_FLAGS "--specs=nosys.specs -T${LINK_SCRIPT}" CACHE INTERNAL "")
 SET(CMAKE_C_FLAGS "${ARCH_FLAGS} ${STARTUP_DEFS} -Os -flto -ffunction-sections -fdata-sections")
