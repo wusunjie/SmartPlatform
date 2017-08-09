@@ -6,8 +6,10 @@ SET(CMAKE_SYSTEM_VERSION 1)
 # specify the cross compiler
 SET(CMAKE_C_COMPILER   /usr/local/bin/arm-none-eabi-gcc)
 SET(CMAKE_CXX_COMPILER /usr/local/bin/arm-none-eabi-g++)
-SET(CMAKE_ASM-ATT-COMPILER /usr/local/bin/arm-none-eabi-as)
+SET(CMAKE_ASM_COMPILER /usr/local/bin/arm-none-eabi-as)
 SET(CMAKE_LINKER /usr/local/bin/arm-none-eabi-ld)
+
+ENABLE_LANGUAGE(ASM)
 
 # where is the target environment 
 SET(CMAKE_FIND_ROOT_PATH  /usr/local/lib/gcc/arm-none-eabi)
