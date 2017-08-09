@@ -16,5 +16,5 @@ ELSE()
 ENDIF()
 
 SET(LINK_SCRIPT ${STM32_PLATFORM_TOP}/arch/ldscripts/multi-ram.ld)
-SET(CMAKE_EXE_LINKER_FLAGS "--specs=nosys.specs -T${LINK_SCRIPT}" CACHE INTERNAL "")
+SET(CMAKE_EXE_LINKER_FLAGS "-Wl,--gc-sections --specs=nosys.specs -T${LINK_SCRIPT}" CACHE INTERNAL "")
 SET(CMAKE_C_FLAGS "${ARCH_FLAGS} ${STARTUP_DEFS} -Os -flto -ffunction-sections -fdata-sections")
