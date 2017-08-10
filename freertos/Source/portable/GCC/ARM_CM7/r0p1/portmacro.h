@@ -208,6 +208,10 @@ not necessary for to use this port.  They are defined so the common demo files
 	#define portFORCE_INLINE inline __attribute__(( always_inline))
 #endif
 
+#ifndef portFORCE_USED
+    #define portFORCE_USED  __attribute__(( used ))
+#endif
+
 portFORCE_INLINE static BaseType_t xPortIsInsideInterrupt( void )
 {
 uint32_t ulCurrentInterrupt;

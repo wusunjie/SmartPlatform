@@ -149,6 +149,10 @@ extern void vClearInterruptMaskFromISR( uint32_t ulMask )  __attribute__((naked)
 
 #define portNOP()
 
+#ifndef portFORCE_USED
+    #define portFORCE_USED  __attribute__(( used ))
+#endif
+
 #ifdef __cplusplus
 }
 #endif

@@ -243,6 +243,10 @@ not necessary for to use this port.  They are defined so the common demo files
 	#define portFORCE_INLINE inline __attribute__(( always_inline))
 #endif
 
+#ifndef portFORCE_USED
+    #define portFORCE_USED  __attribute__(( used ))
+#endif
+
 /* Set the privilege level to user mode if xRunningPrivileged is false. */
 portFORCE_INLINE static void vPortResetPrivilege( BaseType_t xRunningPrivileged )
 {
