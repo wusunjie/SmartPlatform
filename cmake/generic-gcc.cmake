@@ -6,8 +6,6 @@ ELSEIF(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m3")
     SET(ARCH_FLAGS "${CMAKE_C_FLAGS} -mcpu=cortex-m3 -march=armv7-m -mthumb -msoft-float")
     SET_PROPERTY(SOURCE ${STM32_PLATFORM_TOP}/arch/startup/startup_ARMCM3.S PROPERTY LANGUAGE C)
     LIST(APPEND SRC_LIST ${STM32_PLATFORM_TOP}/arch/startup/startup_ARMCM3.S)
-ELSEIF(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-a9")
-    SET(ARCH_FLAGS "${CMAKE_C_FLAGS} -mcpu=cortex-a9 -march=armv7-a -mthumb -mfloat-abi=hard -mfpu=neon")
 ELSE()
     message(FATAL_ERROR
         "No C compiler for '${CMAKE_SYSTEM_PROCESSOR}'"
