@@ -15,3 +15,5 @@ ELSE()
 ENDIF()
 
 ADD_EXECUTABLE(hello ${SRC_LIST})
+
+CREATE_IMAGE(hello)

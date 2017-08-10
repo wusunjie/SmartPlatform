@@ -6,7 +6,8 @@ SET(CMAKE_SYSTEM_VERSION 1)
 # specify the cross compiler
 SET(CMAKE_C_COMPILER   /usr/local/bin/arm-none-eabi-gcc)
 SET(CMAKE_CXX_COMPILER /usr/local/bin/arm-none-eabi-g++)
-SET(CMAKE_LINKER /usr/local/bin/arm-none-eabi-ld)
+SET(OBJ_COPY /usr/local/bin/arm-none-eabi-objcopy)
+SET(OBJ_SIZE /usr/local/bin/arm-none-eabi-size)
 
 # where is the target environment 
 SET(CMAKE_FIND_ROOT_PATH  /usr/local/lib/gcc/arm-none-eabi)

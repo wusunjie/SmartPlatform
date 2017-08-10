@@ -21,3 +21,14 @@ ENDIF()
 
 SET(CMAKE_EXE_LINKER_FLAGS "-L${STM32_PLATFORM_TOP} -Wl,--gc-sections --specs=nosys.specs -T${LINK_SCRIPT}" CACHE INTERNAL "" FORCE)
 SET(CMAKE_C_FLAGS "${ARCH_FLAGS} ${STARTUP_DEFS} -Os -flto -ffunction-sections -fdata-sections" CACHE INTERNAL "" FORCE)
+
+# post-process elf files into .hex files:
+FUNCTION(CREATE_IMAGE target_name)
+    ADD_CUSTOM_COMMAND(TARGET ${target_name}
+        POST_BUILD
+        COMMAND "${OBJ_COPY}" -O ihex ${target_name} ${target_name}.hex
+        COMMENT "Creating ${target_name}.hex ..."
+        COMMAND "${OBJ_SIZE}" ${target_name}
+        VERBATIM
+    )
+ENDFUNCTION()
