@@ -10,7 +10,6 @@ PROJECT(hello)
 
 IF(STM32_PLATFORM_USE_FREERTOS STREQUAL "true")
     LIST(APPEND SRC_LIST main.c)
-    INCLUDE(${CMAKE_CURRENT_LIST_DIR}/../cmake/rtos-freertos.cmake)
 ELSE()
     LIST(APPEND SRC_LIST helloworld.c)
 ENDIF()
