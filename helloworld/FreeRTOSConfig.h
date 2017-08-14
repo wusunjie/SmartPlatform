@@ -104,6 +104,8 @@
 #define configUSE_MALLOC_FAILED_HOOK			1
 #define configUSE_APPLICATION_TASK_TAG			0
 #define configUSE_COUNTING_SEMAPHORES			1
+#define configSUPPORT_STATIC_ALLOCATION         1
+#define configSUPPORT_DYNAMIC_ALLOCATION        0
 
 /* The full demo always has tasks to run so the tick will never be turned off.
 The blinky demo will use the default tickless idle implementation to turn the
@@ -117,7 +119,7 @@ tick off. */
 format the raw data provided by the uxTaskGetSystemState() function in to human
 readable ASCII form.  See the notes in the implementation of vTaskList() within
 FreeRTOS/Source/tasks.c for limitations. */
-#define configUSE_STATS_FORMATTING_FUNCTIONS	1
+#define configUSE_STATS_FORMATTING_FUNCTIONS	0
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES 			0
