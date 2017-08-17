@@ -12,4 +12,4 @@ MEMORY
   RAM2 (rwx) : ORIGIN = 0x20000000, LENGTH = 0x2000 /* 8K */
 }
 
-INCLUDE arch/ldscripts/multi-ram.ld
+INCLUDE arch/CMSIS/Device/Script/nosys.ld
