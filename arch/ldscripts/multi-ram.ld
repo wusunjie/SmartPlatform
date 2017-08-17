@@ -29,6 +29,10 @@
  *   __StackTop
  *   __stack
  */
+
+__stack = ORIGIN(RAM) + LENGTH(RAM);
+_estack = __stack;
+
 ENTRY(Reset_Handler)
 
 SECTIONS
@@ -102,16 +106,41 @@ SECTIONS
 		__zero_table_end__ = .;
 	} > FLASH
 
+    _etext = .;
 	__etext = .;
-		
-	.data : AT (__etext)
-	{
-		__data_start__ = .;
-		*(vtable)
-		*(.data*)
-		__data_end__ = .;
 
-	} > RAM
+	/*
+     * This address is used by the startup code to
+     * initialise the .data section.
+     */
+    _sidata = _etext;
+		
+	/*
+     * The initialised data section.
+     * The program executes knowing that the data is in the RAM
+     * but the loader puts the initial values in the ROM (inidata).
+     * It is one task of the startup to copy the initial values from
+     * ROM to RAM.
+     */
+    .data  : AT ( _sidata )
+    {
+        . = ALIGN(4);
+
+        /* This is used by the startup code to initialise the .data section */
+        _sdata = . ;            /* STM specific definition */
+        __data_start__ = . ;
+        *(.data_begin .data_begin.*)
+
+        *(.data .data.*)
+
+        *(.data_end .data_end.*)
+        . = ALIGN(4);
+
+        /* This is used by the startup code to initialise the .data section */
+        _edata = . ;            /* STM specific definition */
+        __data_end__ = . ;
+
+    } >RAM
 
 	__etext2 = __etext + SIZEOF(.data);
 	.data2 : AT (__etext2)
@@ -150,9 +179,11 @@ SECTIONS
 	{
 		. = ALIGN(4);
 		__bss_start__ = .;
+		_sbss = .;              /* STM specific definition */
 		*(.bss*)
 		. = ALIGN(4);
 		__bss_end__ = .;
+		_ebss = . ;             /* STM specific definition */
 	} > RAM
 
 	.bss2 :
