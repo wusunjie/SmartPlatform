@@ -2,8 +2,8 @@
 
 ## prepare
 
-1. gcc-arm-none-eabi toolchain is installed at /usr/local/bin.
-2. toolchain root path is at /usr/local/lib/gcc/arm-none-eabi.
+1. sudo apt install cmake.
+2. sudo apt install gcc-arm-none-eabi.
 
 ## build
 
