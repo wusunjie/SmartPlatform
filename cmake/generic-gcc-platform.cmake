@@ -41,26 +41,11 @@ IF(FPU_PRESENT EQUAL 1)
 
 ENDIF()
 
-IF(STM32_PLATFORM_USE_FREERTOS STREQUAL "true")
-    INCLUDE(${STM32_PLATFORM_TOP}/cmake/rtos-freertos.cmake)
-    SET(LINK_SCRIPT ${STM32_PLATFORM_TOP}/board/${STM32_PLATFORM_BOARD_NAME}/Script/${STM32_PLATFORM_BOARD_NAME}-freertos.ld)
-ELSE()
-    SET(LINK_SCRIPT ${STM32_PLATFORM_TOP}/board/${STM32_PLATFORM_BOARD_NAME}/Script/${STM32_PLATFORM_BOARD_NAME}-nosys.ld)
-ENDIF()
+INCLUDE(${STM32_PLATFORM_TOP}/cmake/rtos-freertos.cmake)
+SET(LINK_SCRIPT ${STM32_PLATFORM_TOP}/board/${STM32_PLATFORM_BOARD_NAME}/Script/${STM32_PLATFORM_BOARD_NAME}-freertos.ld)
 
 SET_PROPERTY(SOURCE ${STM32_PLATFORM_TOP}/arch/CMSIS/Device/Source/startup_${STM32_PLATFORM_MCU_TYPE}.s PROPERTY LANGUAGE C)
 LIST(APPEND SRC_LIST ${STM32_PLATFORM_TOP}/arch/CMSIS/Device/Source/startup_${STM32_PLATFORM_MCU_TYPE}.s)
 
 SET(CMAKE_EXE_LINKER_FLAGS "-L${STM32_PLATFORM_TOP} -Wl,--gc-sections --specs=nosys.specs -T${LINK_SCRIPT}" CACHE INTERNAL "" FORCE)
 SET(CMAKE_C_FLAGS "${ARCH_FLAGS} ${STARTUP_DEFS} -Os -ffunction-sections -fdata-sections" CACHE INTERNAL "" FORCE)
-
-# post-process elf files into .hex files:
-FUNCTION(CREATE_IMAGE target_name)
-    ADD_CUSTOM_COMMAND(TARGET ${target_name}
-        POST_BUILD
-        COMMAND "${OBJ_COPY}" -O ihex ${target_name} ${target_name}.hex
-        COMMENT "Creating ${target_name}.hex ..."
-        COMMAND "${OBJ_SIZE}" ${target_name}
-        VERBATIM
-    )
-ENDFUNCTION()
