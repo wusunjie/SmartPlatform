@@ -7,7 +7,7 @@
 
 ## build
 
-make BOARD_NAME=stm3210c_eval FOLDER_NAME=helloworld <br>
+make BOARD_NAME=stm3210c_eval <br>
 
 ## currently supported board
 
