@@ -7,13 +7,7 @@
 
 ## build
 
-1. enter example folder ~/SmartPlatform/helloworld: <br>
-cd ~/SmartPlatform/helloworld
-2. create out folder and enter it for out-of-source build: <br>
-mkdir out && cd out
-3. start building: <br>
-cmake -DSTM32_PLATFORM_BOARD_NAME=stm3210c_eval .. <br>
-make
+mkdir out && cmake -DSTM32_PLATFORM_BOARD_NAME=stm3210c_eval helloworld -Bout && make -C out <br>
 
 ## currently supported board
 
