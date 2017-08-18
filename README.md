@@ -7,7 +7,7 @@
 
 ## build
 
-mkdir out && cmake -DSTM32_PLATFORM_BOARD_NAME=stm3210c_eval helloworld -Bout && make -C out <br>
+make BOARD_NAME=stm3210c_eval FOLDER_NAME=helloworld <br>
 
 ## currently supported board
 
