@@ -1,4 +1,4 @@
-lib$(BOARD_NAME)-Platform.a:
+out/Platform/lib$(BOARD_NAME)-Platform.a:
 	cmake -DSTM32_PLATFORM_BOARD_NAME=$(BOARD_NAME) cmake/Platform -Bout/Platform
 	make -C out/Platform
 
