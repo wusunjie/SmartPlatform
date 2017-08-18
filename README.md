@@ -7,7 +7,7 @@
 
 ## build
 
-make BOARD_NAME=stm3210c_eval <br>
+make BOARD_NAME=stm3210c_eval.
 
 ## currently supported board
 
