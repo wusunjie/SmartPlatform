@@ -1,8 +1,8 @@
 /* Default memory layout. */
 MEMORY
 {
-  ROM (rx)         : ORIGIN = 0x00, LENGTH = 0x80000
-  RAM (rw)         : ORIGIN = 0x20000000, LENGTH = 0x8000
+  ROM (rx)         : ORIGIN = 0x00000000, LENGTH = 0x100000
+  RAM (rw)         : ORIGIN = 0x20000000, LENGTH = 0x20000
 }
 
 /* Variables used by FreeRTOS-MPU. */

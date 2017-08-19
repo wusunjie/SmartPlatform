@@ -47,8 +47,8 @@ SET(LINK_SCRIPT ${STM32_PLATFORM_TOP}/board/${STM32_PLATFORM_BOARD_NAME}/Script/
 SET_PROPERTY(SOURCE ${STM32_PLATFORM_TOP}/arch/CMSIS/Device/Source/startup_${STM32_PLATFORM_MCU_TYPE}.s PROPERTY LANGUAGE C)
 LIST(APPEND SRC_LIST ${STM32_PLATFORM_TOP}/arch/CMSIS/Device/Source/startup_${STM32_PLATFORM_MCU_TYPE}.s)
 
-SET(CMAKE_EXE_LINKER_FLAGS "-L${STM32_PLATFORM_TOP} -Wl,--gc-sections --specs=nosys.specs -T${LINK_SCRIPT}" CACHE INTERNAL "" FORCE)
-SET(CMAKE_C_FLAGS "${ARCH_FLAGS} ${STARTUP_DEFS} -Os -ffunction-sections -fdata-sections" CACHE INTERNAL "" FORCE)
+SET(CMAKE_EXE_LINKER_FLAGS "-L${STM32_PLATFORM_TOP} -Wl,--gc-sections -Wl,-Map,${STM32_PLATFORM_BOARD_NAME}-Platform.map --specs=nosys.specs -T${LINK_SCRIPT}" CACHE INTERNAL "" FORCE)
+SET(CMAKE_C_FLAGS "${ARCH_FLAGS} ${STARTUP_DEFS} -g -Os -flto -ffunction-sections -fdata-sections" CACHE INTERNAL "" FORCE)
 
 # post-process elf files into .hex files:
 FUNCTION(CREATE_IMAGE target_name)
