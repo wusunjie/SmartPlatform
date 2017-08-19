@@ -8,8 +8,8 @@
 ## build
 
 for Platform: <br>
-make BOARD_NAME=stm3210c_eval
+make BOARD_NAME=stm32f4_discovery
 
 ## currently supported board
 
-1. stm3210c_eval
+1. stm32f4_discovery
