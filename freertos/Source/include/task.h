@@ -549,9 +549,14 @@ TaskHandle_t xHandle;
  * \defgroup xTaskCreateRestricted xTaskCreateRestricted
  * \ingroup Tasks
  */
-#if( portUSING_MPU_WRAPPERS == 1 )
-	BaseType_t xTaskCreateRestricted( const TaskParameters_t * const pxTaskDefinition, TaskHandle_t *pxCreatedTask ) PRIVILEGED_FUNCTION;
-#endif
+
+#if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
+
+	#if( portUSING_MPU_WRAPPERS == 1 )
+		BaseType_t xTaskCreateRestricted( const TaskParameters_t * const pxTaskDefinition, TaskHandle_t *pxCreatedTask ) PRIVILEGED_FUNCTION;
+	#endif
+
+#endif /* configSUPPORT_DYNAMIC_ALLOCATION */
 
 /**
  * task. h

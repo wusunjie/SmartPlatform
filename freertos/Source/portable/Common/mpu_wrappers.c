@@ -96,15 +96,20 @@ extern BaseType_t xPortRaisePrivilege( void );
 
 /*-----------------------------------------------------------*/
 
-BaseType_t MPU_xTaskCreateRestricted( const TaskParameters_t * const pxTaskDefinition, TaskHandle_t *pxCreatedTask )
-{
-BaseType_t xReturn;
-BaseType_t xRunningPrivileged = xPortRaisePrivilege();
+#if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
 
-	xReturn = xTaskCreateRestricted( pxTaskDefinition, pxCreatedTask );
-	vPortResetPrivilege( xRunningPrivileged );
-	return xReturn;
-}
+	BaseType_t MPU_xTaskCreateRestricted( const TaskParameters_t * const pxTaskDefinition, TaskHandle_t *pxCreatedTask )
+	{
+	BaseType_t xReturn;
+	BaseType_t xRunningPrivileged = xPortRaisePrivilege();
+
+		xReturn = xTaskCreateRestricted( pxTaskDefinition, pxCreatedTask );
+		vPortResetPrivilege( xRunningPrivileged );
+		return xReturn;
+	}
+
+#endif /* configSUPPORT_DYNAMIC_ALLOCATION */
+
 /*-----------------------------------------------------------*/
 
 #if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )

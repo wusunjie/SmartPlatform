@@ -626,49 +626,53 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB ) PRIVILEGED_FUNCTION;
 #endif /* SUPPORT_STATIC_ALLOCATION */
 /*-----------------------------------------------------------*/
 
-#if( portUSING_MPU_WRAPPERS == 1 )
+#if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
 
-	BaseType_t xTaskCreateRestricted( const TaskParameters_t * const pxTaskDefinition, TaskHandle_t *pxCreatedTask )
-	{
-	TCB_t *pxNewTCB;
-	BaseType_t xReturn = errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY;
+	#if( portUSING_MPU_WRAPPERS == 1 )
 
-		configASSERT( pxTaskDefinition->puxStackBuffer );
-
-		if( pxTaskDefinition->puxStackBuffer != NULL )
+		BaseType_t xTaskCreateRestricted( const TaskParameters_t * const pxTaskDefinition, TaskHandle_t *pxCreatedTask )
 		{
-			/* Allocate space for the TCB.  Where the memory comes from depends
-			on the implementation of the port malloc function and whether or
-			not static allocation is being used. */
-			pxNewTCB = ( TCB_t * ) pvPortMalloc( sizeof( TCB_t ) );
+		TCB_t *pxNewTCB;
+		BaseType_t xReturn = errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY;
 
-			if( pxNewTCB != NULL )
+			configASSERT( pxTaskDefinition->puxStackBuffer );
+
+			if( pxTaskDefinition->puxStackBuffer != NULL )
 			{
-				/* Store the stack location in the TCB. */
-				pxNewTCB->pxStack = pxTaskDefinition->puxStackBuffer;
+				/* Allocate space for the TCB.  Where the memory comes from depends
+				on the implementation of the port malloc function and whether or
+				not static allocation is being used. */
+				pxNewTCB = ( TCB_t * ) pvPortMalloc( sizeof( TCB_t ) );
 
-				/* Tasks can be created statically or dynamically, so note
-				this task had a statically allocated stack in case it is
-				later deleted.  The TCB was allocated dynamically. */
-				pxNewTCB->ucStaticallyAllocated = tskSTATICALLY_ALLOCATED_STACK_ONLY;
+				if( pxNewTCB != NULL )
+				{
+					/* Store the stack location in the TCB. */
+					pxNewTCB->pxStack = pxTaskDefinition->puxStackBuffer;
 
-				prvInitialiseNewTask(	pxTaskDefinition->pvTaskCode,
-										pxTaskDefinition->pcName,
-										( uint32_t ) pxTaskDefinition->usStackDepth,
-										pxTaskDefinition->pvParameters,
-										pxTaskDefinition->uxPriority,
-										pxCreatedTask, pxNewTCB,
-										pxTaskDefinition->xRegions );
+					/* Tasks can be created statically or dynamically, so note
+					this task had a statically allocated stack in case it is
+					later deleted.  The TCB was allocated dynamically. */
+					pxNewTCB->ucStaticallyAllocated = tskSTATICALLY_ALLOCATED_STACK_ONLY;
 
-				prvAddNewTaskToReadyList( pxNewTCB );
-				xReturn = pdPASS;
+					prvInitialiseNewTask(	pxTaskDefinition->pvTaskCode,
+											pxTaskDefinition->pcName,
+											( uint32_t ) pxTaskDefinition->usStackDepth,
+											pxTaskDefinition->pvParameters,
+											pxTaskDefinition->uxPriority,
+											pxCreatedTask, pxNewTCB,
+											pxTaskDefinition->xRegions );
+
+					prvAddNewTaskToReadyList( pxNewTCB );
+					xReturn = pdPASS;
+				}
 			}
+
+			return xReturn;
 		}
 
-		return xReturn;
-	}
+	#endif /* portUSING_MPU_WRAPPERS */
 
-#endif /* portUSING_MPU_WRAPPERS */
+#endif /* configSUPPORT_DYNAMIC_ALLOCATION */
 /*-----------------------------------------------------------*/
 
 #if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
