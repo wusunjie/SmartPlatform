@@ -167,7 +167,7 @@ SECTIONS
      * It is one task of the startup to copy the initial values from
      * ROM to RAM.
      */
-    .data  : AT ( _etext )
+    .data  : AT ( _sidata )
     {
         . = ALIGN(4);
 
