@@ -116,18 +116,7 @@ SECTIONS
 
         *(vtable)                   /* C++ virtual tables */
 
-    } >ROM
-
-    .rodata :
-    {
-        *(.rodata*)        /* read-only data (constants) */
     } > ROM
-
-    /*
-     * This address is used by the startup code to
-     * initialise the .data section.
-     */
-    _sidata = .;
 
     .glue :
     {
@@ -157,17 +146,19 @@ SECTIONS
     } > ROM
     __exidx_end = .;
 
+    .rodata :
+    {
+        *(.rodata*)        /* read-only data (constants) */
+    } > ROM
+
     . = ALIGN(4);
     _etext = .;
 
-    privileged_data : AT ( _etext )
-    {
-        *(privileged_data)
-        /* Non kernel data is kept out of the first _Privileged_Data_Region_Size
-        bytes of SRAM. */
-        __privileged_data_actual_end__ = .;
-        . = _Privileged_Data_Region_Size;
-    } > RAM
+    /*
+     * This address is used by the startup code to
+     * initialise the .data section.
+     */
+    _sidata = _etext;
 
     /*
      * The initialised data section.
@@ -176,7 +167,7 @@ SECTIONS
      * It is one task of the startup to copy the initial values from
      * ROM to RAM.
      */
-    .data  :
+    .data  : AT ( _etext )
     {
         . = ALIGN(4);
 
@@ -194,7 +185,7 @@ SECTIONS
         _edata = . ;            /* STM specific definition */
         __data_end__ = . ;
 
-    } >RAM
+    } > RAM
 
 
     /*
@@ -215,7 +206,16 @@ SECTIONS
         . = ALIGN(4);
         __bss_end__ = .;        /* standard newlib definition */
         _ebss = . ;             /* STM specific definition */
-    } >RAM
+    } > RAM
+
+    privileged_data :
+    {
+        *(privileged_data)
+        /* Non kernel data is kept out of the first _Privileged_Data_Region_Size
+        bytes of SRAM. */
+        __privileged_data_actual_end__ = .;
+        . = _Privileged_Data_Region_Size;
+    } > RAM
 
     .noinit (NOLOAD) :
     {
@@ -248,7 +248,7 @@ SECTIONS
         . = . + _Minimum_Stack_Size ;
 
         . = ALIGN(4);
-    } >RAM
+    } > RAM
 
     /* After that there are only debugging sections. */
 
