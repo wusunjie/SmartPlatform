@@ -121,7 +121,13 @@ SECTIONS
     .rodata :
     {
         *(.rodata*)        /* read-only data (constants) */
-    } >ROM
+    } > ROM
+
+    /*
+     * This address is used by the startup code to
+     * initialise the .data section.
+     */
+    _sidata = .;
 
     .glue :
     {
@@ -153,24 +159,8 @@ SECTIONS
 
     . = ALIGN(4);
     _etext = .;
-    __etext = .;
 
-    /*
-     * This address is used by the startup code to
-     * initialise the .data section.
-     */
-    _sidata = _etext;
-
-    /* MEMORY_ARRAY */
-    /*
-    .ROarraySection :
-    {
-        *(.ROarraySection .ROarraySection.*)
-    } >MEMORY_ARRAY
-    */
-
-
-    privileged_data :
+    privileged_data : AT ( _etext )
     {
         *(privileged_data)
         /* Non kernel data is kept out of the first _Privileged_Data_Region_Size
@@ -186,7 +176,7 @@ SECTIONS
      * It is one task of the startup to copy the initial values from
      * ROM to RAM.
      */
-    .data  : AT ( _sidata )
+    .data  :
     {
         . = ALIGN(4);
 
