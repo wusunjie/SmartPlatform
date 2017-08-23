@@ -41,10 +41,10 @@
 
 typedef enum
 {
-  LED4 = 0,
-  LED3 = 1,
-  LED5 = 2,
-  LED6 = 3
+    LED4 = 0,
+    LED3 = 1,
+    LED5 = 2,
+    LED6 = 3
 } Led_TypeDef;
 
 GPIO_TypeDef* GPIO_PORT[LEDn] = {LED4_GPIO_PORT,
@@ -67,20 +67,20 @@ const uint16_t GPIO_PIN[LEDn] = {LED4_PIN,
   */
 void BSP_LED_Init(Led_TypeDef Led)
 {
-  GPIO_InitTypeDef  GPIO_InitStruct;
+    GPIO_InitTypeDef  GPIO_InitStruct;
 
-  /* Enable the GPIO_LED Clock */
-  LEDx_GPIO_CLK_ENABLE(Led);
+    /* Enable the GPIO_LED Clock */
+    LEDx_GPIO_CLK_ENABLE(Led);
 
-  /* Configure the GPIO_LED pin */
-  GPIO_InitStruct.Pin = GPIO_PIN[Led];
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
+    /* Configure the GPIO_LED pin */
+    GPIO_InitStruct.Pin = GPIO_PIN[Led];
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
 
-  HAL_GPIO_Init(GPIO_PORT[Led], &GPIO_InitStruct);
+    HAL_GPIO_Init(GPIO_PORT[Led], &GPIO_InitStruct);
 
-  HAL_GPIO_WritePin(GPIO_PORT[Led], GPIO_PIN[Led], GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIO_PORT[Led], GPIO_PIN[Led], GPIO_PIN_RESET);
 }
 
 /**
@@ -94,7 +94,7 @@ void BSP_LED_Init(Led_TypeDef Led)
   */
 void BSP_LED_On(Led_TypeDef Led)
 {
-  HAL_GPIO_WritePin(GPIO_PORT[Led], GPIO_PIN[Led], GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIO_PORT[Led], GPIO_PIN[Led], GPIO_PIN_SET);
 }
 
 /**
@@ -108,7 +108,7 @@ void BSP_LED_On(Led_TypeDef Led)
   */
 void BSP_LED_Off(Led_TypeDef Led)
 {
-  HAL_GPIO_WritePin(GPIO_PORT[Led], GPIO_PIN[Led], GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIO_PORT[Led], GPIO_PIN[Led], GPIO_PIN_RESET);
 }
 
 /**
@@ -127,31 +127,48 @@ void BSP_LED_Toggle(Led_TypeDef Led)
 
 int main(void)
 {
-	SystemCoreClockUpdate();
-  
-	HAL_Init();
+    SystemCoreClockUpdate();
 
-	BSP_LED_Init(LED3);
-	BSP_LED_Init(LED4);
-	BSP_LED_Init(LED5);
-	BSP_LED_Init(LED6);
+    HAL_Init();
 
-	BSP_LED_Off(LED3);
-	BSP_LED_On(LED4);
-	BSP_LED_Off(LED5);
-	BSP_LED_On(LED6);
+    BSP_LED_Init(LED3);
+    BSP_LED_Init(LED4);
+    BSP_LED_Init(LED5);
+    BSP_LED_Init(LED6);
 
-	while (1);
+    BSP_LED_Off(LED3);
+    BSP_LED_On(LED4);
 
-	return 0;
+    vTaskStartScheduler();
+
+    while (1);
+
+    return 0;
 }
 
 void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize )
 {
+    /* If the buffers to be provided to the Idle task are declared inside this
+    function then they must be declared static - otherwise they will be allocated on
+    the stack and so not exists after this function exits. */
+    static StaticTask_t xIdleTaskTCB;
+    static StackType_t uxIdleTaskStack[ configMINIMAL_STACK_SIZE ];
 
+    /* Pass out a pointer to the StaticTask_t structure in which the Idle task's
+    state will be stored. */
+    *ppxIdleTaskTCBBuffer = &xIdleTaskTCB;
+
+    /* Pass out the array that will be used as the Idle task's stack. */
+    *ppxIdleTaskStackBuffer = uxIdleTaskStack;
+
+    /* Pass out the size of the array pointed to by *ppxIdleTaskStackBuffer.
+    Note that, as the array is necessarily of type StackType_t,
+    configMINIMAL_STACK_SIZE is specified in words, not bytes. */
+    *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
 }
 
 void vApplicationIdleHook( void )
 {
-
+    BSP_LED_Off(LED5);
+    BSP_LED_On(LED6);
 }
