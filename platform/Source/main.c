@@ -123,7 +123,7 @@ void BSP_LED_Off(Led_TypeDef Led)
   */
 void BSP_LED_Toggle(Led_TypeDef Led)
 {
-  HAL_GPIO_TogglePin(GPIO_PORT[Led], GPIO_PIN[Led]);
+    HAL_GPIO_TogglePin(GPIO_PORT[Led], GPIO_PIN[Led]);
 }
 
 static void AppTimerCallback( TimerHandle_t xTimer );
