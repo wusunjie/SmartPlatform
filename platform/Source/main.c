@@ -1,6 +1,7 @@
 #include "stm32f4xx_hal.h"
 
 #include "FreeRTOS.h"
+#include "timers.h"
 
 /** @defgroup STM32F4_DISCOVERY_LOW_LEVEL_LED STM32F4 DISCOVERY LOW LEVEL LED
   * @{
@@ -125,8 +126,18 @@ void BSP_LED_Toggle(Led_TypeDef Led)
   HAL_GPIO_TogglePin(GPIO_PORT[Led], GPIO_PIN[Led]);
 }
 
+static void AppTimerCallback( TimerHandle_t xTimer );
+
+static void AppTimerCallback( TimerHandle_t xTimer )
+{
+    BSP_LED_Toggle(LED5);
+    BSP_LED_Toggle(LED6);
+}
+
 int main(void)
 {
+    TimerHandle_t timer;
+    static StaticTimer_t BlinkTimer;
     SystemCoreClockUpdate();
 
     HAL_Init();
@@ -139,7 +150,11 @@ int main(void)
     BSP_LED_On(LED3);
     BSP_LED_On(LED4);
 
-    vTaskStartScheduler();
+    timer = xTimerCreateStatic("BlinkTimer", 1000 / portTICK_PERIOD_MS, pdTRUE, NULL, AppTimerCallback, &BlinkTimer);
+
+    if (pdPASS == xTimerStart(timer, 0)) {
+        vTaskStartScheduler();
+    }
 
     while (1);
 
