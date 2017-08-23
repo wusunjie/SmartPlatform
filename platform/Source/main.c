@@ -134,8 +134,12 @@ static void AppTimerCallback( TimerHandle_t xTimer )
     BSP_LED_Toggle(LED6);
 }
 
+static TimerHandle_t timer;
+
 int main(void)
 {
+    static StaticTimer_t BlinkTimer;
+
     SystemCoreClockUpdate();
 
     HAL_Init();
@@ -148,7 +152,11 @@ int main(void)
     BSP_LED_On(LED3);
     BSP_LED_On(LED4);
 
-    vTaskStartScheduler();
+    timer = xTimerCreateStatic("BlinkTimer", 1000 / portTICK_PERIOD_MS, pdTRUE, NULL, AppTimerCallback, &BlinkTimer);
+
+    if (timer) {
+        vTaskStartScheduler();
+    }
 
     while (1);
 
@@ -178,13 +186,9 @@ void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackTy
 
 void vApplicationIdleHook( void )
 {
-    static StaticTimer_t BlinkTimer;
-    static int flag = 0;
-
-    if (!flag) {
+    if (pdFALSE == xTimerIsTimerActive(timer)) {
         BSP_LED_On(LED5);
         BSP_LED_On(LED6);
-        xTimerStart(xTimerCreateStatic("BlinkTimer", 1000 / portTICK_PERIOD_MS, pdTRUE, NULL, AppTimerCallback, &BlinkTimer), 0);
-        flag = 1;
+        xTimerStart(timer, 0);
     }
 }
