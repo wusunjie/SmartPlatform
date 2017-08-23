@@ -136,7 +136,7 @@ int main(void)
     BSP_LED_Init(LED5);
     BSP_LED_Init(LED6);
 
-    BSP_LED_Off(LED3);
+    BSP_LED_On(LED3);
     BSP_LED_On(LED4);
 
     vTaskStartScheduler();
@@ -169,6 +169,6 @@ void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackTy
 
 void vApplicationIdleHook( void )
 {
-    BSP_LED_Off(LED5);
+    BSP_LED_On(LED5);
     BSP_LED_On(LED6);
 }

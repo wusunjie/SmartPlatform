@@ -25,20 +25,12 @@ SECTIONS
      * For Cortex-M devices, the beginning of the startup code is stored in
      * the .isr_vector section, which goes to ROM
      */
-    privileged_functions :
+    isr_vector :
     {
         . = ALIGN(4);
         _isr_vector = .;
         KEEP(*(.isr_vector))
-        *(privileged_functions)
-        . = ALIGN(4);
-
-        /* Non privileged code is after _Privileged_Functions_Region_Size. */
-        __privileged_functions_actual_end__ = .;
-        . = _Privileged_Functions_Region_Size;
     } > ROM
-
-
 
     .text :
     {
@@ -206,15 +198,6 @@ SECTIONS
         . = ALIGN(4);
         __bss_end__ = .;        /* standard newlib definition */
         _ebss = . ;             /* STM specific definition */
-    } > RAM
-
-    privileged_data :
-    {
-        *(privileged_data)
-        /* Non kernel data is kept out of the first _Privileged_Data_Region_Size
-        bytes of SRAM. */
-        __privileged_data_actual_end__ = .;
-        . = _Privileged_Data_Region_Size;
     } > RAM
 
     .noinit (NOLOAD) :
