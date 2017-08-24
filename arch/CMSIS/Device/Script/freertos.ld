@@ -166,11 +166,21 @@ SECTIONS
         /* This is used by the startup code to initialise the .data section */
         _sdata = . ;            /* STM specific definition */
         __data_start__ = . ;
+
+        . = ALIGN(4);
+
         *(.data_begin .data_begin.*)
 
         *(.data .data.*)
 
+        _device_list = . ;
+
+        *(.device)
+
+        _device_list_end = . ;
+
         *(.data_end .data_end.*)
+
         . = ALIGN(4);
 
         /* This is used by the startup code to initialise the .data section */

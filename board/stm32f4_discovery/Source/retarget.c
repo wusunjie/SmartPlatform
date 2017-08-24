@@ -8,6 +8,7 @@ struct devopt {
 };
 
 struct device {
+    int id;
     char type;
     struct devopt opt;
 };
@@ -21,27 +22,18 @@ struct uart_dev {
     struct uart_config config;
 };
 
-static struct uart_dev gpscom_dev = {
-    .base.type = 0,
-    .base.opt.open = NULL,
-    .base.opt.close = NULL,
-    .base.opt.read = NULL,
-    .base.opt.write = NULL,
-    .config.baudrate = 9600
-};
-
-static struct device *devlist[] = {
-    (struct device *)&gpscom_dev
-};
+extern struct device **_device_list;
+extern struct device **_device_list_end;
 
 void device_open(void)
 {
     int i;
-    for (i = 0; i < sizeof(devlist) / sizeof(struct device *); i++) {
-        switch (devlist[i]->type) {
+
+    for (i = 0; i < (_device_list_end - _device_list) / sizeof(struct device *); i++) {
+        switch (_device_list[i]->type) {
             case 0:
             {
-                struct uart_dev *dev = (struct uart_dev *)devlist[i];
+                struct uart_dev *dev = (struct uart_dev *)_device_list[i];
                 if (dev->base.opt.open) {
                     dev->base.opt.open(&(dev->config));
                 }
@@ -56,12 +48,13 @@ void device_open(void)
 void device_close(void)
 {
     int i;
-    for (i = 0; i < sizeof(devlist) / sizeof(struct device *); i++) {
-        switch (devlist[i]->type) {
+
+    for (i = 0; i < (_device_list_end - _device_list) / sizeof(struct device *); i++) {
+        switch (_device_list[i]->type) {
             case 0:
             {
-                if (devlist[i]->opt.close) {
-                    devlist[i]->opt.close();
+                if (_device_list[i]->opt.close) {
+                    _device_list[i]->opt.close();
                 }
             }
             break;
@@ -73,20 +66,14 @@ void device_close(void)
 
 int _read(int file, char *ptr, int len)
 {
-    if (file >= sizeof(devlist) / sizeof(struct device *)) {
-        return -1;
-    }
+    int i;
 
-    switch (devlist[file]->type) {
-        case 0:
-        {
-            if (devlist[file]->opt.read) {
-                return devlist[file]->opt.read(ptr, len);
+    for (i = 0; i < (_device_list_end - _device_list) / sizeof(struct device *); i++) {
+        if (file == _device_list_end[file]->id) {
+            if (_device_list[file]->opt.read) {
+                return _device_list[file]->opt.read(ptr, len);
             }
         }
-        break;
-        default:
-        break;
     }
 
     return -1;
@@ -94,20 +81,14 @@ int _read(int file, char *ptr, int len)
 
 int _write(int file, char *ptr, int len)
 {
-    if (file >= sizeof(devlist) / sizeof(struct device *)) {
-        return -1;
-    }
+    int i;
 
-    switch (devlist[file]->type) {
-        case 0:
-        {
-            if (devlist[file]->opt.write) {
-                return devlist[file]->opt.write(ptr, len);
+    for (i = 0; i < (_device_list_end - _device_list) / sizeof(struct device *); i++) {
+        if (file == _device_list_end[file]->id) {
+            if (_device_list[file]->opt.read) {
+                return _device_list[file]->opt.write(ptr, len);
             }
         }
-        break;
-        default:
-        break;
     }
 
     return -1;
