@@ -83,6 +83,14 @@ SECTIONS
 
         . = ALIGN(4);
 
+        PROVIDE_HIDDEN (__device_list = .);
+
+        KEEP(*(.device))
+
+        PROVIDE_HIDDEN (__device_list_end = .);
+
+        . = ALIGN(4);
+
         /*
          * The init code, i.e. an array of pointers to static constructors.
          */
@@ -169,16 +177,6 @@ SECTIONS
         *(.data_begin .data_begin.*)
 
         *(.data .data.*)
-
-        . = ALIGN(4);
-
-        _device_list = . ;
-
-        *(.device)
-
-        _device_list_end = . ;
-
-        . = ALIGN(4);
 
         *(.data_end .data_end.*)
 

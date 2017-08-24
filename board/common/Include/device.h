@@ -13,4 +13,14 @@ struct device {
     struct devopt opt;
 };
 
+#define DEVICE_DEFINE(DEV, ID)   \
+    static struct device DEV = { \
+      .id = ID,                  \
+      .opt.open = DEV##_open,    \
+      .opt.close = DEV##_close,  \
+      .opt.read = DEV##_read,    \
+      .opt.write = DEV##_write   \
+    };                           \
+    static const struct device *DEV##_dev __attribute__((section(".device"))) = &DEV
+
 #endif

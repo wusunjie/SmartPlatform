@@ -57,15 +57,12 @@ static int gpscom_read(char *buf, int len);
 static UART_HandleTypeDef UartHandle;
 static __IO ITStatus UartReady = RESET;
 
-static struct device gpscom = {
-    .id = 0,
-    .opt.open = gpscom_open,
-    .opt.close = gpscom_close,
-    .opt.read = gpscom_read,
-    .opt.write = gpscom_write
-};
+#pragma GCC push_options
+#pragma GCC optimize("O0")
 
-static struct device *gpscom_dev __attribute__((section(".device"))) = &gpscom;
+DEVICE_DEFINE(gpscom, 0);
+
+#pragma GCC pop_options
 
 /* Exported functions ------------------------------------------------------- */
 
