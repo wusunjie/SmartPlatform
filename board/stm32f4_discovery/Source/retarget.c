@@ -20,7 +20,7 @@ void device_open(void)
 {
     int i;
 
-    for (i = 0; i < (_device_list_end - _device_list) / sizeof(struct device *); i++) {
+    for (i = 0; i < (_device_list_end - _device_list); i++) {
         if (_device_list[i]->opt.open) {
             _device_list[i]->opt.open();
         }
@@ -31,7 +31,7 @@ void device_close(void)
 {
     int i;
 
-    for (i = 0; i < (_device_list_end - _device_list) / sizeof(struct device *); i++) {
+    for (i = 0; i < (_device_list_end - _device_list); i++) {
         if (_device_list[i]->opt.close) {
             _device_list[i]->opt.close();
         }
@@ -42,7 +42,7 @@ int _read(int file, char *ptr, int len)
 {
     int i;
 
-    for (i = 0; i < (_device_list_end - _device_list) / sizeof(struct device *); i++) {
+    for (i = 0; i < (_device_list_end - _device_list); i++) {
         if (file == _device_list_end[file]->id) {
             if (_device_list[file]->opt.read) {
                 return _device_list[file]->opt.read(ptr, len);
@@ -58,7 +58,7 @@ int _write(int file, char *ptr, int len)
 {
     int i;
 
-    for (i = 0; i < (_device_list_end - _device_list) / sizeof(struct device *); i++) {
+    for (i = 0; i < (_device_list_end - _device_list); i++) {
         if (file == _device_list_end[file]->id) {
             if (_device_list[file]->opt.read) {
                 return _device_list[file]->opt.write(ptr, len);
