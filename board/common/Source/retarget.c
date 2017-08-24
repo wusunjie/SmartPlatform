@@ -1,17 +1,6 @@
 #include <stdlib.h>
 
-struct devopt {
-    void (*open)(void);
-    void (*close)(void);
-    int (*read)(char *buf, int len);
-    int (*write)(char *buf, int len);
-};
-
-struct device {
-    int id;
-    char type;
-    struct devopt opt;
-};
+#include "device.h"
 
 extern struct device **_device_list;
 extern struct device **_device_list_end;
