@@ -38,14 +38,6 @@
 #define USARTx_IRQn                      USART2_IRQn
 #define USARTx_IRQHandler                USART2_IRQHandler
 
-/* Size of Transmission buffer */
-#define TXBUFFERSIZE                     (COUNTOF(aTxBuffer) - 1)
-/* Size of Reception buffer */
-#define RXBUFFERSIZE                     TXBUFFERSIZE
-  
-/* Exported macro ------------------------------------------------------------*/
-#define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
-
 static UART_HandleTypeDef UartHandle;
 static DMA_HandleTypeDef hdma_tx;
 static DMA_HandleTypeDef hdma_rx;
