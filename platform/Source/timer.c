@@ -1,10 +1,10 @@
-#include "stm32f4xx_hal.h"
+#include "system.h"
 
 #include "FreeRTOS.h"
 
 void vApplicationTickHook( void )
 {
-    HAL_IncTick();
+    system_tick();
 }
 
 void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize )

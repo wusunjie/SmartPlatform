@@ -39,9 +39,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
-
-extern void device_open(void);
-extern void device_close(void);
+#include "device.h"
 
 /** @addtogroup STM32F4xx_HAL_Driver
   * @{
@@ -62,6 +60,17 @@ extern void device_close(void);
 /** @defgroup HAL_MSP_Private_Functions HAL MSP Private Functions
   * @{
   */
+
+void system_init(void)
+{
+    SystemCoreClockUpdate();
+    HAL_Init();
+}
+
+void system_tick(void)
+{
+    HAL_IncTick();
+}
 
 /**
   * @brief  System Clock Configuration

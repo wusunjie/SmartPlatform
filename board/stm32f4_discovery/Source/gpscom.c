@@ -46,15 +46,10 @@
 /* Exported macro ------------------------------------------------------------*/
 #define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
 
-static void gpscom_open(void);
-
-static void gpscom_close(void);
-
-static int gpscom_write(char *buf, int len);
-
-static int gpscom_read(char *buf, int len);
-
 static UART_HandleTypeDef UartHandle;
+static DMA_HandleTypeDef hdma_tx;
+static DMA_HandleTypeDef hdma_rx;
+
 static __IO ITStatus UartReady = RESET;
 
 #pragma GCC push_options
@@ -78,9 +73,6 @@ DEVICE_DEFINE(gpscom, 0);
   */
 void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 {
-    DMA_HandleTypeDef hdma_tx;
-    DMA_HandleTypeDef hdma_rx;
-
     GPIO_InitTypeDef  GPIO_InitStruct;
 
     /*##-1- Enable peripherals and GPIO Clocks #################################*/
@@ -175,9 +167,6 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
   */
 void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
 {
-    DMA_HandleTypeDef hdma_tx;
-    DMA_HandleTypeDef hdma_rx;
-
     /*##-1- Reset peripherals ##################################################*/
     USARTx_FORCE_RESET();
     USARTx_RELEASE_RESET();
