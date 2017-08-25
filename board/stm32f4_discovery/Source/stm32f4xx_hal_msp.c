@@ -61,17 +61,6 @@
   * @{
   */
 
-void system_init(void)
-{
-    SystemCoreClockUpdate();
-    HAL_Init();
-}
-
-void system_tick(void)
-{
-    HAL_IncTick();
-}
-
 /**
   * @brief  System Clock Configuration
   *         The system Clock is configured as follow :
