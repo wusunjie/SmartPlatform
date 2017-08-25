@@ -83,7 +83,7 @@ SECTIONS
 
         . = ALIGN(4);
 
-        PROVIDE_HIDDEN (__device_list = .);
+        PROVIDE_HIDDEN (__device_list_begin = .);
 
         KEEP(*(.device))
 
