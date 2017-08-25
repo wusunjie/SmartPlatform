@@ -1,5 +1,7 @@
 #include "system.h"
 
+#include "boardcfg.h"
+
 #include "FreeRTOS.h"
 #include "timers.h"
 
@@ -10,13 +12,13 @@ static void AppTimerCallback( TimerHandle_t xTimer );
 static void AppTimerCallback( TimerHandle_t xTimer )
 {
     char val = 0;
-    if (read(3, &val, 1)) {
+    if (read(DEV_LEDGPIO3_ID, &val, 1)) {
         val = !val;
-        write(3, &val, 1);
+        write(DEV_LEDGPIO3_ID, &val, 1);
     }
-    if (read(4, &val, 1)) {
+    if (read(DEV_LEDGPIO4_ID, &val, 1)) {
         val = !val;
-        write(4, &val, 1);
+        write(DEV_LEDGPIO4_ID, &val, 1);
     }
 }
 
@@ -30,8 +32,8 @@ int main(void)
 
     system_init();
 
-    write(1, &val, 1);
-    write(2, &val, 1);
+    write(DEV_LEDGPIO1_ID, &val, 1);
+    write(DEV_LEDGPIO2_ID, &val, 1);
 
     timer = xTimerCreateStatic("BlinkTimer", 1000 / portTICK_PERIOD_MS, pdTRUE, NULL, AppTimerCallback, &BlinkTimer);
 
@@ -69,8 +71,8 @@ void vApplicationIdleHook( void )
 {
     if (pdFALSE == xTimerIsTimerActive(timer)) {
         int val = 1;
-        write(3, &val, 1);
-        write(4, &val, 1);
+        write(DEV_LEDGPIO3_ID, &val, 1);
+        write(DEV_LEDGPIO4_ID, &val, 1);
         xTimerStart(timer, 0);
     }
 }

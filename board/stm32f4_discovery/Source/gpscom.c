@@ -1,4 +1,5 @@
 #include "device.h"
+#include "boardcfg.h"
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 
@@ -42,12 +43,14 @@ static UART_HandleTypeDef UartHandle;
 static DMA_HandleTypeDef hdma_tx;
 static DMA_HandleTypeDef hdma_rx;
 
+static int open_deffer_flag = 0;
+
 static __IO ITStatus UartReady = RESET;
 
 #pragma GCC push_options
 #pragma GCC optimize("O0")
 
-DEVICE_DEFINE(gpscom, 0);
+DEVICE_DEFINE(gpscom, DEV_GPSCOM_ID);
 
 #pragma GCC pop_options
 
@@ -134,19 +137,6 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
     /* Associate the initialized DMA handle to the the UART handle */
     __HAL_LINKDMA(huart, hdmarx, hdma_rx);
-
-    /*##-4- Configure the NVIC for DMA #########################################*/
-    /* NVIC configuration for DMA transfer complete interrupt (USARTx_TX) */
-    HAL_NVIC_SetPriority(USARTx_DMA_TX_IRQn, 0, 1);
-    HAL_NVIC_EnableIRQ(USARTx_DMA_TX_IRQn);
-
-    /* NVIC configuration for DMA transfer complete interrupt (USARTx_RX) */
-    HAL_NVIC_SetPriority(USARTx_DMA_RX_IRQn, 0, 0);   
-    HAL_NVIC_EnableIRQ(USARTx_DMA_RX_IRQn);
-
-    /* NVIC configuration for USART TC interrupt */
-    HAL_NVIC_SetPriority(USARTx_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(USARTx_IRQn);
 }
 
 /**
@@ -202,6 +192,22 @@ DEVICE_FUNC_DEFINE_CLOSE(gpscom)
 
 DEVICE_FUNC_DEFINE_WRITE(gpscom)
 {
+    if (!open_deffer_flag) {
+        /*##-4- Configure the NVIC for DMA #########################################*/
+        /* NVIC configuration for DMA transfer complete interrupt (USARTx_TX) */
+        HAL_NVIC_SetPriority(USARTx_DMA_TX_IRQn, 0, 1);
+        HAL_NVIC_EnableIRQ(USARTx_DMA_TX_IRQn);
+
+        /* NVIC configuration for DMA transfer complete interrupt (USARTx_RX) */
+        HAL_NVIC_SetPriority(USARTx_DMA_RX_IRQn, 0, 0);   
+        HAL_NVIC_EnableIRQ(USARTx_DMA_RX_IRQn);
+
+        /* NVIC configuration for USART TC interrupt */
+        HAL_NVIC_SetPriority(USARTx_IRQn, 0, 0);
+        HAL_NVIC_EnableIRQ(USARTx_IRQn);
+        open_deffer_flag = 1;
+    }
+
     UartReady = RESET;
 
     /*##-2- Start the transmission process #####################################*/  
@@ -219,6 +225,22 @@ DEVICE_FUNC_DEFINE_WRITE(gpscom)
 
 DEVICE_FUNC_DEFINE_READ(gpscom)
 {
+    if (!open_deffer_flag) {
+        /*##-4- Configure the NVIC for DMA #########################################*/
+        /* NVIC configuration for DMA transfer complete interrupt (USARTx_TX) */
+        HAL_NVIC_SetPriority(USARTx_DMA_TX_IRQn, 0, 1);
+        HAL_NVIC_EnableIRQ(USARTx_DMA_TX_IRQn);
+
+        /* NVIC configuration for DMA transfer complete interrupt (USARTx_RX) */
+        HAL_NVIC_SetPriority(USARTx_DMA_RX_IRQn, 0, 0);   
+        HAL_NVIC_EnableIRQ(USARTx_DMA_RX_IRQn);
+
+        /* NVIC configuration for USART TC interrupt */
+        HAL_NVIC_SetPriority(USARTx_IRQn, 0, 0);
+        HAL_NVIC_EnableIRQ(USARTx_IRQn);
+        open_deffer_flag = 1;
+    }
+
     UartReady = RESET;
 
     /*##-2- Start the transmission process #####################################*/  

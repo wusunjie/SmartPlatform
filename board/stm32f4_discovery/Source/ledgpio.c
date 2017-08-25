@@ -1,4 +1,5 @@
 #include "device.h"
+#include "boardcfg.h"
 #include "stm32f4xx_hal.h"
 
 /** @defgroup STM32F4_DISCOVERY_LOW_LEVEL_LED STM32F4 DISCOVERY LOW LEVEL LED
@@ -66,10 +67,10 @@ static GPIO_PinState BSP_LED_Read(Led_TypeDef led);
 #pragma GCC push_options
 #pragma GCC optimize("O0")
 
-DEVICE_DEFINE(ledgpio_led4, 1);
-DEVICE_DEFINE(ledgpio_led3, 2);
-DEVICE_DEFINE(ledgpio_led5, 3);
-DEVICE_DEFINE(ledgpio_led6, 4);
+DEVICE_DEFINE(ledgpio_led4, DEV_LEDGPIO1_ID);
+DEVICE_DEFINE(ledgpio_led3, DEV_LEDGPIO2_ID);
+DEVICE_DEFINE(ledgpio_led5, DEV_LEDGPIO3_ID);
+DEVICE_DEFINE(ledgpio_led6, DEV_LEDGPIO4_ID);
 
 #pragma GCC pop_options
 
