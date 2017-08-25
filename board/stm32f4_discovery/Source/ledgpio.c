@@ -133,16 +133,16 @@ static GPIO_PinState BSP_LED_Read(Led_TypeDef Led)
     return HAL_GPIO_ReadPin(GPIO_PORT[Led], GPIO_PIN[Led]);
 }
 
-static void ledgpio_led4_open(void)
+DEVICE_FUNC_DEFINE_OPEN(ledgpio_led4)
 {
     BSP_LED_Init(LED4);
 }
 
-static void ledgpio_led4_close(void)
+DEVICE_FUNC_DEFINE_CLOSE(ledgpio_led4)
 {
 }
 
-static int ledgpio_led4_write(char *buf, int len)
+DEVICE_FUNC_DEFINE_WRITE(ledgpio_led4)
 {
     if (len < 1) {
         return -1;
@@ -158,7 +158,7 @@ static int ledgpio_led4_write(char *buf, int len)
     return 0;
 }
 
-static int ledgpio_led4_read(char *buf, int len)
+DEVICE_FUNC_DEFINE_READ(ledgpio_led4)
 {
     if (len < 1) {
         return -1;
@@ -173,16 +173,16 @@ static int ledgpio_led4_read(char *buf, int len)
     return 0;
 }
 
-static void ledgpio_led3_open(void)
+DEVICE_FUNC_DEFINE_OPEN(ledgpio_led3)
 {
     BSP_LED_Init(LED3);
 }
 
-static void ledgpio_led3_close(void)
+DEVICE_FUNC_DEFINE_CLOSE(ledgpio_led3)
 {
 }
 
-static int ledgpio_led3_write(char *buf, int len)
+DEVICE_FUNC_DEFINE_WRITE(ledgpio_led3)
 {
     if (len < 1) {
         return -1;
@@ -198,7 +198,7 @@ static int ledgpio_led3_write(char *buf, int len)
     return 0;
 }
 
-static int ledgpio_led3_read(char *buf, int len)
+DEVICE_FUNC_DEFINE_READ(ledgpio_led3)
 {
     if (len < 1) {
         return -1;
@@ -213,16 +213,16 @@ static int ledgpio_led3_read(char *buf, int len)
     return 0;
 }
 
-static void ledgpio_led5_open(void)
+DEVICE_FUNC_DEFINE_OPEN(ledgpio_led5)
 {
     BSP_LED_Init(LED5);
 }
 
-static void ledgpio_led5_close(void)
+DEVICE_FUNC_DEFINE_CLOSE(ledgpio_led5)
 {
 }
 
-static int ledgpio_led5_write(char *buf, int len)
+DEVICE_FUNC_DEFINE_WRITE(ledgpio_led5)
 {
     if (len < 1) {
         return -1;
@@ -238,7 +238,7 @@ static int ledgpio_led5_write(char *buf, int len)
     return 0;
 }
 
-static int ledgpio_led5_read(char *buf, int len)
+DEVICE_FUNC_DEFINE_READ(ledgpio_led5)
 {
     if (len < 1) {
         return -1;
@@ -253,16 +253,16 @@ static int ledgpio_led5_read(char *buf, int len)
     return 0;
 }
 
-static void ledgpio_led6_open(void)
+DEVICE_FUNC_DEFINE_OPEN(ledgpio_led6)
 {
     BSP_LED_Init(LED6);
 }
 
-static void ledgpio_led6_close(void)
+DEVICE_FUNC_DEFINE_CLOSE(ledgpio_led6)
 {
 }
 
-static int ledgpio_led6_write(char *buf, int len)
+DEVICE_FUNC_DEFINE_WRITE(ledgpio_led6)
 {
     if (len < 1) {
         return -1;
@@ -278,7 +278,7 @@ static int ledgpio_led6_write(char *buf, int len)
     return 0;
 }
 
-static int ledgpio_led6_read(char *buf, int len)
+DEVICE_FUNC_DEFINE_READ(ledgpio_led6)
 {
     if (len < 1) {
         return -1;

@@ -188,7 +188,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
     HAL_NVIC_DisableIRQ(USARTx_DMA_RX_IRQn);
 }
 
-static void gpscom_open(void)
+DEVICE_FUNC_DEFINE_OPEN(gpscom)
 {
     UartHandle.Instance          = USARTx;
 
@@ -203,12 +203,12 @@ static void gpscom_open(void)
     HAL_UART_Init(&UartHandle);
 }
 
-static void gpscom_close(void)
+DEVICE_FUNC_DEFINE_CLOSE(gpscom)
 {
     HAL_UART_DeInit(&UartHandle);
 }
 
-static int gpscom_write(char *buf, int len)
+DEVICE_FUNC_DEFINE_WRITE(gpscom)
 {
     UartReady = RESET;
 
@@ -225,7 +225,7 @@ static int gpscom_write(char *buf, int len)
     return 0;
 }
 
-static int gpscom_read(char *buf, int len)
+DEVICE_FUNC_DEFINE_READ(gpscom)
 {
     UartReady = RESET;
 
