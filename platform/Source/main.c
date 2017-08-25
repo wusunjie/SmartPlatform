@@ -8,11 +8,11 @@ static void AppTimerCallback( TimerHandle_t xTimer );
 static void AppTimerCallback( TimerHandle_t xTimer )
 {
     char val = 0;
-    if (!read(3, &val)) {
+    if (read(3, &val)) {
         val = !val;
         write(3, &val);
     }
-    if (!read(4, &val)) {
+    if (read(4, &val)) {
         val = !val;
         write(4, &val);
     }

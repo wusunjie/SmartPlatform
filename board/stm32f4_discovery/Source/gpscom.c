@@ -222,7 +222,7 @@ DEVICE_FUNC_DEFINE_WRITE(gpscom)
     /*##-3- Wait for the end of the transfer ###################################*/  
     while (UartReady != SET);
 
-    return 0;
+    return len;
 }
 
 DEVICE_FUNC_DEFINE_READ(gpscom)
@@ -239,7 +239,7 @@ DEVICE_FUNC_DEFINE_READ(gpscom)
     /*##-3- Wait for the end of the transfer ###################################*/  
     while (UartReady != SET);
 
-    return 0;
+    return len;
 }
 
 /******************************************************************************/

@@ -155,7 +155,7 @@ DEVICE_FUNC_DEFINE_WRITE(ledgpio_led4)
         BSP_LED_Off(LED4);
     }
 
-    return 0;
+    return 1;
 }
 
 DEVICE_FUNC_DEFINE_READ(ledgpio_led4)
@@ -170,7 +170,7 @@ DEVICE_FUNC_DEFINE_READ(ledgpio_led4)
         buf[0] = 0;
     }
 
-    return 0;
+    return 1;
 }
 
 DEVICE_FUNC_DEFINE_OPEN(ledgpio_led3)
@@ -195,7 +195,7 @@ DEVICE_FUNC_DEFINE_WRITE(ledgpio_led3)
         BSP_LED_Off(LED3);
     }
 
-    return 0;
+    return 1;
 }
 
 DEVICE_FUNC_DEFINE_READ(ledgpio_led3)
@@ -210,7 +210,7 @@ DEVICE_FUNC_DEFINE_READ(ledgpio_led3)
         buf[0] = 0;
     }
 
-    return 0;
+    return 1;
 }
 
 DEVICE_FUNC_DEFINE_OPEN(ledgpio_led5)
@@ -235,7 +235,7 @@ DEVICE_FUNC_DEFINE_WRITE(ledgpio_led5)
         BSP_LED_Off(LED5);
     }
 
-    return 0;
+    return 1;
 }
 
 DEVICE_FUNC_DEFINE_READ(ledgpio_led5)
@@ -250,7 +250,7 @@ DEVICE_FUNC_DEFINE_READ(ledgpio_led5)
         buf[0] = 0;
     }
 
-    return 0;
+    return 1;
 }
 
 DEVICE_FUNC_DEFINE_OPEN(ledgpio_led6)
@@ -275,7 +275,7 @@ DEVICE_FUNC_DEFINE_WRITE(ledgpio_led6)
         BSP_LED_Off(LED6);
     }
 
-    return 0;
+    return 1;
 }
 
 DEVICE_FUNC_DEFINE_READ(ledgpio_led6)
@@ -290,5 +290,5 @@ DEVICE_FUNC_DEFINE_READ(ledgpio_led6)
         buf[0] = 0;
     }
 
-    return 0;
+    return 1;
 }
