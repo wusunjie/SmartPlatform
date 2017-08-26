@@ -47,12 +47,7 @@ static DMA_HandleTypeDef hdma_tx;
 static DMA_HandleTypeDef hdma_rx;
 static TaskHandle_t cur = NULL;
 
-#pragma GCC push_options
-#pragma GCC optimize("O0")
-
 DEVICE_DEFINE(gpscom, DEV_GPSCOM_ID);
-
-#pragma GCC pop_options
 
 /* Exported functions ------------------------------------------------------- */
 

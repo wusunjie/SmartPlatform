@@ -25,7 +25,8 @@ struct device {
       .opt.read = DEV##_read,                   \
       .opt.write = DEV##_write                  \
     };                                          \
-    static const struct device *DEV##_dev __attribute__((section(".device"))) = &DEV
+    static const struct device *DEV##_dev __attribute__((__used__)) \
+    __attribute__((section(".device"))) = &DEV
 
 
 #define DEVICE_FUNC_DEFINE_OPEN(DEV) \

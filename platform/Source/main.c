@@ -29,8 +29,17 @@ int main(void)
     static StaticTimer_t BlinkTimer;
 
     char val = 1;
+    char buf[5] = {0};
 
     system_init();
+
+    write(DEV_GPSCOM_ID, "AT+GPSRD", 8);
+
+    read(DEV_GPSCOM_ID, buf, 5);
+
+    write(DEV_GPSCOM_ID, "AT+GPS=1", 8);
+
+    read(DEV_GPSCOM_ID, buf, 5);
 
     write(DEV_LEDGPIO1_ID, &val, 1);
     write(DEV_LEDGPIO2_ID, &val, 1);
