@@ -3,6 +3,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 
+#include "FreeRTOS.h"
+#include "task.h"
+
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* User can use this section to tailor USARTx/UARTx instance used and associated 
@@ -42,8 +45,7 @@
 static UART_HandleTypeDef UartHandle;
 static DMA_HandleTypeDef hdma_tx;
 static DMA_HandleTypeDef hdma_rx;
-
-static __IO ITStatus UartReady = RESET;
+static TaskHandle_t cur = NULL;
 
 #pragma GCC push_options
 #pragma GCC optimize("O0")
@@ -203,7 +205,9 @@ DEVICE_FUNC_DEFINE_CLOSE(gpscom)
 
 DEVICE_FUNC_DEFINE_WRITE(gpscom)
 {
-    UartReady = RESET;
+    cur = xTaskGetCurrentTaskHandle();
+
+    xTaskNotifyStateClear(cur);
 
     /*##-2- Start the transmission process #####################################*/  
     /* While the UART in reception process, user can transmit data through 
@@ -213,14 +217,16 @@ DEVICE_FUNC_DEFINE_WRITE(gpscom)
     }
 
     /*##-3- Wait for the end of the transfer ###################################*/  
-    while (UartReady != SET);
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
     return len;
 }
 
 DEVICE_FUNC_DEFINE_READ(gpscom)
 {
-    UartReady = RESET;
+    cur = xTaskGetCurrentTaskHandle();
+
+    xTaskNotifyStateClear(cur);
 
     /*##-2- Start the transmission process #####################################*/  
     /* While the UART in reception process, user can transmit data through 
@@ -230,7 +236,7 @@ DEVICE_FUNC_DEFINE_READ(gpscom)
     }
 
     /*##-3- Wait for the end of the transfer ###################################*/  
-    while (UartReady != SET);
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
     return len;
 }
@@ -282,7 +288,7 @@ void USARTx_IRQHandler(void)
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
 {
     /* Set transmission flag: transfer complete */
-    UartReady = SET;
+    vTaskNotifyGiveFromISR(cur, NULL);
 }
 
 /**
@@ -295,7 +301,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 {
     /* Set transmission flag: transfer complete */
-    UartReady = SET;
+    vTaskNotifyGiveFromISR(cur, NULL);
 }
 
 /**
