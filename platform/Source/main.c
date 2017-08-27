@@ -12,6 +12,7 @@ static void AppTimerCallback( TimerHandle_t xTimer );
 static void AppTimerCallback( TimerHandle_t xTimer )
 {
     char val = 0;
+
     if (read(DEV_LEDGPIO3_ID, &val, 1)) {
         val = !val;
         write(DEV_LEDGPIO3_ID, &val, 1);
@@ -29,17 +30,8 @@ int main(void)
     static StaticTimer_t BlinkTimer;
 
     char val = 1;
-    char buf[5] = {0};
 
     system_init();
-
-    write(DEV_GPSCOM_ID, "AT+GPSRD", 8);
-
-    read(DEV_GPSCOM_ID, buf, 5);
-
-    write(DEV_GPSCOM_ID, "AT+GPS=1", 8);
-
-    read(DEV_GPSCOM_ID, buf, 5);
 
     write(DEV_LEDGPIO1_ID, &val, 1);
     write(DEV_LEDGPIO2_ID, &val, 1);
@@ -78,20 +70,10 @@ void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackTy
 
 void vApplicationIdleHook( void )
 {
-    char buf[5] = {0};
-
     if (pdFALSE == xTimerIsTimerActive(timer)) {
         int val = 1;
         write(DEV_LEDGPIO3_ID, &val, 1);
         write(DEV_LEDGPIO4_ID, &val, 1);
         xTimerStart(timer, 0);
     }
-
-    write(DEV_GPSCOM_ID, "AT+GPSRD", 8);
-
-    read(DEV_GPSCOM_ID, buf, 5);
-
-    write(DEV_GPSCOM_ID, "AT+GPS=1", 8);
-
-    read(DEV_GPSCOM_ID, buf, 5);
 }

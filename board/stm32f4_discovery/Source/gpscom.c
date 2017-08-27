@@ -226,7 +226,7 @@ DEVICE_FUNC_DEFINE_READ(gpscom)
     /*##-2- Start the transmission process #####################################*/  
     /* While the UART in reception process, user can transmit data through 
      "aTxBuffer" buffer */
-    if(HAL_UART_Transmit_DMA(&UartHandle, (uint8_t*)buf, len)!= HAL_OK) {
+    if(HAL_UART_Receive_DMA(&UartHandle, (uint8_t*)buf, len)!= HAL_OK) {
         return -1;
     }
 
