@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <errno.h>
+#include <sys/types.h>
 
 #include "device.h"
 
@@ -57,4 +59,26 @@ int _write(int file, char *ptr, int len)
     }
 
     return -1;
+}
+
+caddr_t _sbrk(int incr)
+{
+    extern char * end;
+    extern char * _Main_Stack_Limit;
+    static char * heap_end;
+    char *        prev_heap_end;
+
+    if (heap_end == NULL)
+        heap_end = end;
+
+    prev_heap_end = heap_end;
+
+    if (heap_end + incr > _Main_Stack_Limit) {
+      errno = ENOMEM;
+      return (caddr_t) -1;
+    }
+
+    heap_end += incr;
+
+    return (caddr_t) prev_heap_end;
 }

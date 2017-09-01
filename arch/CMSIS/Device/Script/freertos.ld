@@ -237,7 +237,7 @@ SECTIONS
     {
         . = ALIGN(4);
 
-        . = . + _Minimum_Stack_Size ;
+        . = . + __Main_Stack_Size ;
 
         . = ALIGN(4);
     } > RAM

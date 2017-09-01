@@ -13,18 +13,18 @@ struct device {
     struct devopt opt;
 };
 
-#define DEVICE_DEFINE(DEV, ID)                  \
-    static void DEV##_open(void);               \
-    static void DEV##_close(void);              \
-    static int DEV##_write(char *buf, int len); \
-    static int DEV##_read(char *buf, int len);  \
-    static struct device DEV = {                \
-      .id = ID,                                 \
-      .opt.open = DEV##_open,                   \
-      .opt.close = DEV##_close,                 \
-      .opt.read = DEV##_read,                   \
-      .opt.write = DEV##_write                  \
-    };                                          \
+#define DEVICE_DEFINE(DEV, ID)                                      \
+    static void DEV##_open(void);                                   \
+    static void DEV##_close(void);                                  \
+    static int DEV##_write(char *buf, int len);                     \
+    static int DEV##_read(char *buf, int len);                      \
+    static struct device DEV = {                                    \
+      .id = ID,                                                     \
+      .opt.open = DEV##_open,                                       \
+      .opt.close = DEV##_close,                                     \
+      .opt.read = DEV##_read,                                       \
+      .opt.write = DEV##_write                                      \
+    };                                                              \
     static const struct device *DEV##_dev __attribute__((__used__)) \
     __attribute__((section(".device"))) = &DEV
 

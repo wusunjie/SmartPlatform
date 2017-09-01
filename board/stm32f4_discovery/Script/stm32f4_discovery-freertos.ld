@@ -13,10 +13,4 @@ MEMORY
 
 __Main_Stack_Size = 2048 ;
 
-/*
- * There will be a link error if there is not this amount of
- * RAM free at the end.
- */
-_Minimum_Stack_Size = 1024 ;
-
 INCLUDE arch/CMSIS/Device/Script/freertos.ld
