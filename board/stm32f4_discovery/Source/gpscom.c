@@ -46,6 +46,7 @@ static UART_HandleTypeDef UartHandle;
 static DMA_HandleTypeDef hdma_tx;
 static DMA_HandleTypeDef hdma_rx;
 static TaskHandle_t cur = NULL;
+static __IO uint16_t rxtxXferCount = 0;
 
 DEVICE_DEFINE(gpscom, DEV_GPSCOM_ID);
 
@@ -144,6 +145,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
     /* NVIC configuration for USART TC interrupt */
     HAL_NVIC_SetPriority(USARTx_IRQn, 0, 0);
+    __HAL_UART_ENABLE_IT(&UartHandle, UART_IT_IDLE);
     HAL_NVIC_EnableIRQ(USARTx_IRQn);
 }
 
@@ -200,9 +202,15 @@ DEVICE_FUNC_DEFINE_CLOSE(gpscom)
 
 DEVICE_FUNC_DEFINE_WRITE(gpscom)
 {
+    if (!len) {
+        return -1;
+    }
+
     cur = xTaskGetCurrentTaskHandle();
 
     xTaskNotifyStateClear(cur);
+
+    rxtxXferCount = len;
 
     /*##-2- Start the transmission process #####################################*/  
     /* While the UART in reception process, user can transmit data through 
@@ -214,12 +222,25 @@ DEVICE_FUNC_DEFINE_WRITE(gpscom)
     /*##-3- Wait for the end of the transfer ###################################*/  
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
+    if (!rxtxXferCount) {
+        return -1;
+    }
+    else {
+        return rxtxXferCount;
+    }
+
     return len;
 }
 
 DEVICE_FUNC_DEFINE_READ(gpscom)
 {
+    if (!len) {
+        return -1;
+    }
+
     cur = xTaskGetCurrentTaskHandle();
+
+    rxtxXferCount = len;
 
     xTaskNotifyStateClear(cur);
 
@@ -233,7 +254,12 @@ DEVICE_FUNC_DEFINE_READ(gpscom)
     /*##-3- Wait for the end of the transfer ###################################*/  
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
-    return len;
+    if (!rxtxXferCount) {
+        return -1;
+    }
+    else {
+        return rxtxXferCount;
+    }
 }
 
 /******************************************************************************/
@@ -270,6 +296,36 @@ void USARTx_DMA_TX_IRQHandler(void)
   */
 void USARTx_IRQHandler(void)
 {
+    uint32_t isrflags   = READ_REG(UartHandle.Instance->SR);
+    uint32_t cr1its     = READ_REG(UartHandle.Instance->CR1);
+    uint32_t cr3its     = READ_REG(UartHandle.Instance->CR3);
+    uint32_t errorflags = 0x00U;
+    uint32_t dmarequest = 0x00U;
+
+    /* If no error occurs */
+    errorflags = (isrflags & (uint32_t)(USART_SR_PE | USART_SR_FE | USART_SR_ORE | USART_SR_NE));
+
+    if(errorflags == RESET) {
+        /* UART in mode Receiver -------------------------------------------------*/
+        if(((isrflags & USART_SR_IDLE) != RESET) && ((cr1its & USART_CR1_IDLEIE) != RESET)) {
+            __HAL_UART_CLEAR_IDLEFLAG(&UartHandle);
+            if (UartHandle.hdmarx != NULL) {
+                DMA_HandleTypeDef *hdma = UartHandle.hdmarx;
+                rxtxXferCount = UartHandle.RxXferSize - __HAL_DMA_GET_COUNTER(hdma);
+                HAL_DMA_Abort(hdma);
+                UartHandle.RxXferCount = 0;
+                if (UartHandle.RxState == HAL_UART_STATE_BUSY_TX_RX) {
+                    UartHandle.RxState = HAL_UART_STATE_BUSY_TX;
+                }
+                else {
+                    UartHandle.RxState = HAL_UART_STATE_READY;
+                }
+                vTaskNotifyGiveFromISR(cur, NULL);
+                return;
+            }
+        }
+    }
+
     HAL_UART_IRQHandler(&UartHandle);
 }
 
@@ -308,4 +364,5 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
   */
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle)
 {
+    rxtxXferCount = 0;
 }
