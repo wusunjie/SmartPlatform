@@ -5,11 +5,7 @@
 #include "FreeRTOS.h"
 #include "timers.h"
 
-#include <string.h>
-
 #include <unistd.h>
-
-static char buf[1024] = {0}; /* reduce the stack usage. */
 
 static void AppTimerCallback( TimerHandle_t xTimer );
 static void PlatformSetupTask( void *args );
@@ -65,24 +61,11 @@ int main(void)
 void PlatformSetupTask( void *args )
 {
     int val = 1;
-    int len = 0;
 
     write(DEV_LEDGPIO3_ID, &val, 1);
     write(DEV_LEDGPIO4_ID, &val, 1);
 
     xTimerStart(timer, 0);
-
-    while (1) {
-        uint16_t l = read(DEV_GPSCOM_ID, buf + len, 1024);
-        if (-1 != l) {
-            len += l;
-            if (strchr(buf, '\r') || strchr(buf, '\n')) {
-                write(DEV_GPSCOM_ID, buf, len);
-                memset(buf, 0, 1024);
-                len = 0;
-            }
-        }
-    }
 
     vTaskSuspend(NULL);
 }
