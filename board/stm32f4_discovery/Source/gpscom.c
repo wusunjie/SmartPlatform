@@ -208,6 +208,10 @@ DEVICE_FUNC_DEFINE_WRITE(gpscom)
 
     cur = xTaskGetCurrentTaskHandle();
 
+    if (!cur) {
+        return -1;
+    }
+
     xTaskNotifyStateClear(cur);
 
     rxtxXferCount = len;
@@ -239,6 +243,10 @@ DEVICE_FUNC_DEFINE_READ(gpscom)
     }
 
     cur = xTaskGetCurrentTaskHandle();
+
+    if (!cur) {
+        return -1;
+    }
 
     rxtxXferCount = len;
 
@@ -298,9 +306,7 @@ void USARTx_IRQHandler(void)
 {
     uint32_t isrflags   = READ_REG(UartHandle.Instance->SR);
     uint32_t cr1its     = READ_REG(UartHandle.Instance->CR1);
-    uint32_t cr3its     = READ_REG(UartHandle.Instance->CR3);
     uint32_t errorflags = 0x00U;
-    uint32_t dmarequest = 0x00U;
 
     /* If no error occurs */
     errorflags = (isrflags & (uint32_t)(USART_SR_PE | USART_SR_FE | USART_SR_ORE | USART_SR_NE));
@@ -365,4 +371,5 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle)
 {
     rxtxXferCount = 0;
+    vTaskNotifyGiveFromISR(cur, NULL);
 }
