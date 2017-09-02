@@ -3,14 +3,13 @@
 #include <stdio.h>
 
 #include "boardcfg.h"
+#include "module.h"
 
 #define GPS_MODULE_SEND(x) write(DEV_GPSCOM_ID, x, sizeof(x) - 1)
 
-static void PlatformLocationTask( void *args );
-
 static char buf[1024] = {0}; /* reduce the stack usage. */
 
-void PlatformLocationTask( void *args )
+MODULE_DEFINE(Location, 200, 1)
 {
     int len = 0;
 
@@ -19,6 +18,8 @@ void PlatformLocationTask( void *args )
     uint16_t lac = 0, ci = 0;
 
     while (1) {
+        uint16_t l = 0;
+
         switch (status) {
             case 0:
             {
@@ -68,7 +69,7 @@ void PlatformLocationTask( void *args )
             default:
             break;
         }
-        uint16_t l = read(DEV_GPSCOM_ID, buf + len, 1024);
+        l = read(DEV_GPSCOM_ID, buf + len, 1024);
         if (-1 != l) {
             len += l;
             if (strchr(buf, '\r') || strchr(buf, '\n')) {
@@ -132,6 +133,13 @@ void PlatformLocationTask( void *args )
                     {
                         if (strstr(buf, "CONNECT OK")) {
                             status = 8;
+                        }
+                    }
+                    break;
+                    case 8:
+                    {
+                        if (strstr(buf, "OK")) {
+                            status = 9;
                         }
                     }
                     break;

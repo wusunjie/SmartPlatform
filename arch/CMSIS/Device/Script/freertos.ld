@@ -91,6 +91,14 @@ SECTIONS
 
         . = ALIGN(4);
 
+        PROVIDE_HIDDEN (__module_list_begin = .);
+
+        KEEP(*(.device))
+
+        PROVIDE_HIDDEN (__module_list_end = .);
+
+        . = ALIGN(4);
+
         /*
          * The init code, i.e. an array of pointers to static constructors.
          */
