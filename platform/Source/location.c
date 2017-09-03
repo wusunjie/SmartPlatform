@@ -79,8 +79,6 @@ MODULE_DEFINE(Location, 1024, 1)
                             if (2 == n) {
                                 if (1 == stat) {
                                     GPS_MODULE_SEND("AT+CGATT=1\r\n");
-                                    val = !val;
-                                    write(DEV_LEDGPIO2_ID, &val, 1);
                                     status++;
                                     break;
                                 }
@@ -95,8 +93,6 @@ MODULE_DEFINE(Location, 1024, 1)
                     {
                         if (strstr(buf, "OK")) {
                             GPS_MODULE_SEND("AT+CGDCONT=1,\"IP\",\"CMNET\"\r\n");
-                            val = !val;
-                            write(DEV_LEDGPIO2_ID, &val, 1);
                             status++;
                         }
                         else if (strstr(buf, "ERROR")) {
@@ -108,8 +104,6 @@ MODULE_DEFINE(Location, 1024, 1)
                     {
                         if (strstr(buf, "OK")) {
                             GPS_MODULE_SEND("AT+CGACT=1,1\r\n");
-                            val = !val;
-                            write(DEV_LEDGPIO2_ID, &val, 1);
                             status++;
                         }
                         else if (strstr(buf, "ERROR")) {
