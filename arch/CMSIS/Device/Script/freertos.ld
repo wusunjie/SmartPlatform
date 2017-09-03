@@ -93,7 +93,7 @@ SECTIONS
 
         PROVIDE_HIDDEN (__module_list_begin = .);
 
-        KEEP(*(.device))
+        KEEP(*(.module))
 
         PROVIDE_HIDDEN (__module_list_end = .);
 

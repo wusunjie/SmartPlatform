@@ -46,14 +46,9 @@ int main(void)
 
     static StaticTimer_t BlinkTimer;
 
-    char val = 1;
-
     system_init();
 
     module_init();
-
-    write(DEV_LEDGPIO1_ID, &val, 1);
-    write(DEV_LEDGPIO2_ID, &val, 1);
 
     timer = xTimerCreateStatic("BlinkTimer", 1000 / portTICK_PERIOD_MS, pdTRUE, NULL, AppTimerCallback, &BlinkTimer);
 

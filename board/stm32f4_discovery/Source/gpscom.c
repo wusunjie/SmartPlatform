@@ -184,7 +184,7 @@ DEVICE_FUNC_DEFINE_OPEN(gpscom)
 {
     UartHandle.Instance          = USARTx;
 
-    UartHandle.Init.BaudRate     = 9600;
+    UartHandle.Init.BaudRate     = 115200;
     UartHandle.Init.WordLength   = UART_WORDLENGTH_8B;
     UartHandle.Init.StopBits     = UART_STOPBITS_1;
     UartHandle.Init.Parity       = UART_PARITY_NONE;
@@ -330,6 +330,9 @@ void USARTx_IRQHandler(void)
                 return;
             }
         }
+    }
+    else if (RESET != (isrflags & (uint32_t)USART_SR_ORE)) {
+        __HAL_UART_CLEAR_OREFLAG(&UartHandle);
     }
 
     HAL_UART_IRQHandler(&UartHandle);
