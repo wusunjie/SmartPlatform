@@ -33,7 +33,7 @@ MODULE_DEFINE(Location, 1024, 1)
     while (1) {
         uint16_t l = read(DEV_GPSCOM_ID, buf + len, 1024);
         /* print log via ITM port 0 */
-        write(STDOUT_FILENO, buf, strlen(buf));
+        printf("%s", buf);
         if (-1 != l) {
             len += l;
             if (strchr(buf, '\r') || strchr(buf, '\n')) {

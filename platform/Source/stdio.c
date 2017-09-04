@@ -1,6 +1,7 @@
 #include <limits.h>
 #include <string.h>
 #include <stdarg.h>
+#include <unistd.h>
 
 extern char *strrev(char *s);
 extern void strpad(char *buf, char pad_val, int count);
@@ -95,6 +96,26 @@ int sprintf(char *str, const char *format, ...)
     va_start(ap, format);
     retval = vsprintf(str, format, ap);
     va_end(ap);
+
+    return retval;
+}
+
+int printf(const char *format, ...)
+{
+    int retval;
+    va_list ap;
+
+    static char buf[51];
+
+    memset(buf, 0, sizeof(buf));
+
+    va_start(ap, format);
+    retval = vsnprintf(buf, 50, format, ap);
+    va_end(ap);
+
+    if (retval > 0) {
+        write(STDOUT_FILENO, buf, retval);
+    }
 
     return retval;
 }
