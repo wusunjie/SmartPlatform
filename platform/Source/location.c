@@ -1,6 +1,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <stdio.h>
 
 #include "boardcfg.h"
 #include "module.h"
@@ -18,8 +19,6 @@ MODULE_DEFINE(Location, 1024, 1)
     char val = 1;
 
     int status = 0;
-
-    int retry = 0;
 
     uint16_t lac = 0, ci = 0;
 
@@ -133,7 +132,7 @@ MODULE_DEFINE(Location, 1024, 1)
                             status++;
                         }
                         else if (strstr(buf, "ERROR")) {
-                            GPS_MODULE_SEND("AT+CIPSTART=\"TCP\",\"202.108.35.235\",80");
+                            GPS_MODULE_SEND("AT+CIPSTART=\"TCP\",\"120.76.213.49\",48758");
                         }
                     }
                     break;
