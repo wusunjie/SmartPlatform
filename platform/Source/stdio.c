@@ -114,10 +114,11 @@ int printf(const char *format, ...)
     va_end(ap);
 
     if (retval > 0) {
-        write(STDOUT_FILENO, buf, retval);
+        return write(STDOUT_FILENO, buf, retval);
     }
-
-    return retval;
+    else {
+        return -1;
+    }
 }
 
 int snprintf(char *str, size_t size, const char *format, ...)
