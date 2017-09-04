@@ -7,7 +7,6 @@
 
 ## build
 
-for Platform: <br>
 make BOARD_NAME=stm32f4_discovery
 
 ## currently supported board
