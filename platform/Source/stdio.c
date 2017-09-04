@@ -105,9 +105,7 @@ int printf(const char *format, ...)
     int retval;
     va_list ap;
 
-    static char buf[51];
-
-    memset(buf, 0, sizeof(buf));
+    static char buf[50];
 
     va_start(ap, format);
     retval = vsnprintf(buf, 50, format, ap);
