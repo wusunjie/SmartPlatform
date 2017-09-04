@@ -1,7 +1,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>
-#include <stdio.h>
 
 #include "boardcfg.h"
 #include "module.h"
@@ -33,6 +32,8 @@ MODULE_DEFINE(Location, 1024, 1)
 
     while (1) {
         uint16_t l = read(DEV_GPSCOM_ID, buf + len, 1024);
+        /* print log via ITM port 0 */
+        write(STDOUT_FILENO, buf, strlen(buf));
         if (-1 != l) {
             len += l;
             if (strchr(buf, '\r') || strchr(buf, '\n')) {
