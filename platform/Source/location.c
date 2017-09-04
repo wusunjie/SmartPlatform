@@ -114,7 +114,7 @@ MODULE_DEFINE(Location, 1024, 1)
                     case 6:
                     {
                         if (strstr(buf, "OK")) {
-                            GPS_MODULE_SEND("AT+CIPSTART=\"TCP\",\"202.108.35.235\",80");
+                            GPS_MODULE_SEND("AT+CIPSTART=\"TCP\",\"120.76.213.49\",56012\r\n");
                             val = !val;
                             write(DEV_LEDGPIO2_ID, &val, 1);
                             status++;
@@ -133,7 +133,7 @@ MODULE_DEFINE(Location, 1024, 1)
                             status++;
                         }
                         else if (strstr(buf, "ERROR")) {
-                            GPS_MODULE_SEND("AT+CIPSTART=\"TCP\",\"120.76.213.49\",48758");
+                            GPS_MODULE_SEND("AT+CIPSTART=\"TCP\",\"120.76.213.49\",56012\r\n");
                         }
                     }
                     break;
