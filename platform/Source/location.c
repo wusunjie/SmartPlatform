@@ -4,22 +4,130 @@
 
 #include "boardcfg.h"
 #include "module.h"
+#include "location.h"
 
 #include "task.h"
+#include "event_groups.h"
+#include "queue.h"
 
-#define GPS_MODULE_SEND(x) write(DEV_GPSCOM_ID, x, strlen(x))
+#define BIT_SETUP     ( 1 << 0 )
+#define BIT_CONNECT   ( 1 << 1 )
+
+static QueueHandle_t LMQueue = NULL;
+
+static EventGroupHandle_t LMEventGroup = NULL;
+
+static uint16_t lac = 0, ci = 0;
+
+static char addr[20] = {0};
+
+static uint16_t port = 0;
+
+static int doNetworkSetupResult = -1;
+
+static int doNetworConnectResult = -1;
 
 static char buf[1024] = {0}; /* reduce the stack usage. */
 
+#define GPS_MODULE_SEND(x) write(DEV_GPSCOM_ID, x, strlen(x))
+
+static int doNetworkSetup(uint16_t *l, uint16_t *c);
+
+static int doNetworkConnect(const char *a, uint16_t p);
+
+int NetworkSetup(uint16_t *l, uint16_t *c)
+{
+    uint16_t type = 0;
+
+    EventBits_t uxBits;
+    
+    if( xQueueSendToBack( LMQueue, ( void * ) &type, ( TickType_t ) 10 ) != pdPASS ) {
+        return -1;
+    }
+
+    uxBits = xEventGroupWaitBits(LMEventGroup, BIT_SETUP, pdTRUE, pdTRUE, portMAX_DELAY);
+
+    if( ( uxBits & BIT_SETUP ) != 0 ) {
+        *l = lac;
+        *c = ci;
+        return doNetworkSetupResult;
+    }
+    else {
+        return -1;
+    }
+}
+
+int NetworkConnect(const char *a, uint16_t p)
+{
+    uint16_t type = 0;
+
+    EventBits_t uxBits;
+
+    strcpy(addr, a);
+
+    port = p;
+    
+    if( xQueueSendToBack( LMQueue, ( void * ) &type, ( TickType_t ) 10 ) != pdPASS ) {
+        return -1;
+    }
+
+    uxBits = xEventGroupWaitBits(LMEventGroup, BIT_CONNECT, pdTRUE, pdTRUE, portMAX_DELAY);
+
+    if( ( uxBits & BIT_CONNECT ) != 0 ) {
+        return doNetworkSetupResult;
+    }
+    else {
+        return -1;
+    }
+}
+
 MODULE_DEFINE(Location, 1024, 1)
+{
+    uint16_t *pxRxedMessage;
+
+    while (1) {
+        if( xQueueReceive( LMQueue, &( pxRxedMessage ), ( TickType_t ) 10 ) ) {
+            switch (*pxRxedMessage) {
+                case 0:
+                {
+                    if (doNetworkSetup(&lac, &ci)) {
+                        doNetworkSetupResult = 0;
+                    }
+                    else {
+                        doNetworkSetupResult = -1;
+                    }
+
+                    xEventGroupSetBits(LMEventGroup, BIT_SETUP);
+                }
+                break;
+                case 1:
+                {
+                    if (doNetworkConnect(addr, port)) {
+                        doNetworConnectResult = 0;
+                    }
+                    else {
+                        doNetworConnectResult = -1;
+                    }
+
+                    xEventGroupSetBits(LMEventGroup, BIT_CONNECT);
+                }
+                break;
+                default:
+                break;
+            }
+        }
+    }
+
+    vTaskSuspend(NULL);
+}
+
+static int doNetworkSetup(uint16_t *l, uint16_t *c)
 {
     int len = 0;
 
     char val = 1;
 
     int status = 0;
-
-    uint16_t lac = 0, ci = 0;
 
     write(DEV_LEDGPIO1_ID, &val, 1);
 
@@ -32,8 +140,6 @@ MODULE_DEFINE(Location, 1024, 1)
 
     while (1) {
         uint16_t l = read(DEV_GPSCOM_ID, buf + len, 1024);
-        /* print log via ITM port 0 */
-        printf("%s", buf);
         if (-1 != l) {
             len += l;
             if (strchr(buf, '\r') || strchr(buf, '\n')) {
@@ -74,7 +180,7 @@ MODULE_DEFINE(Location, 1024, 1)
                     case 3:
                     {
                         int n = -1, stat = -1;
-                        int ret = sscanf(buf, "%*[^+]+CREG: %d,%d,\"%hx\",\"%hx\"", &n, &stat, &lac, &ci);
+                        int ret = sscanf(buf, "%*[^+]+CREG: %d,%d,\"%hx\",\"%hx\"", &n, &stat, l, c);
                         if (ret >= 2) {
                             if (2 == n) {
                                 if (1 == stat) {
@@ -104,7 +210,7 @@ MODULE_DEFINE(Location, 1024, 1)
                     {
                         if (strstr(buf, "OK")) {
                             GPS_MODULE_SEND("AT+CGACT=1,1\r\n");
-                            status++;
+                            
                         }
                         else if (strstr(buf, "ERROR")) {
                             GPS_MODULE_SEND("AT+CGDCONT=1,\"IP\",\"CMNET\"\r\n");
@@ -114,17 +220,48 @@ MODULE_DEFINE(Location, 1024, 1)
                     case 6:
                     {
                         if (strstr(buf, "OK")) {
-                            GPS_MODULE_SEND("AT+CIPSTART=\"TCP\",\"120.76.213.49\",56012\r\n");
                             val = !val;
                             write(DEV_LEDGPIO2_ID, &val, 1);
-                            status++;
+                            return 0;
                         }
                         else if (strstr(buf, "ERROR")) {
                             GPS_MODULE_SEND("AT+CGACT=1,1\r\n");
                         }
                     }
                     break;
-                    case 7:
+                    default:
+                    break;
+                }
+                memset(buf, 0, 1024);
+                len = 0;
+            }
+        }
+    }
+
+    return -1;
+}
+
+static int doNetworkConnect(const char *a, uint16_t p)
+{
+    int len = 0;
+
+    char val = 1;
+
+    int status = 0;
+
+    char strbuf[50] = {0};
+
+    snprintf(strbuf, 50, "AT+CIPSTART=\"TCP\",\"%s\",%d\r\n", a, p);
+
+    GPS_MODULE_SEND(strbuf);
+
+    while (1) {
+        uint16_t l = read(DEV_GPSCOM_ID, buf + len, 1024);
+        if (-1 != l) {
+            len += l;
+            if (strchr(buf, '\r') || strchr(buf, '\n')) {
+                switch (status) {
+                    case 0:
                     {
                         if (strstr(buf, "CONNECT OK")) {
                             GPS_MODULE_SEND("AT+CIPTMODE=1");
@@ -137,12 +274,12 @@ MODULE_DEFINE(Location, 1024, 1)
                         }
                     }
                     break;
-                    case 8:
+                    case 1:
                     {
                         if (strstr(buf, "OK")) {
                             val = !val;
                             write(DEV_LEDGPIO2_ID, &val, 1);
-                            status++;
+                            return 0;
                         }
                         else if (strstr(buf, "ERROR")) {
                             GPS_MODULE_SEND("AT+CIPTMODE=1");
@@ -158,5 +295,6 @@ MODULE_DEFINE(Location, 1024, 1)
         }
     }
 
-    vTaskSuspend(NULL);
+    return -1;
 }
+
