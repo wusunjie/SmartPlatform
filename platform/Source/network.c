@@ -424,6 +424,10 @@ static int doNetworkSubmit(const char *rq)
 static int doNetworkShutdown(void)
 {
     if (NETWORK_STATUS_CONNECTED == nstatus) {
+        /* FIXME:
+           we should wait 2 seconds since THE LAST TRANSMITION.
+           we should record the time, then determine how long
+           we should wait here. */
         vTaskDelay(2000 / portTICK_PERIOD_MS);
         GPS_MODULE_SEND("+++\r\n");
         /* should not wait the reply:
