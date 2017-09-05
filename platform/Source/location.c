@@ -121,6 +121,34 @@ MODULE_DEFINE(Location, 1024, 1)
     vTaskSuspend(NULL);
 }
 
+MODULE_INIT_DEFINE(Location)
+{
+    // StaticEventGroup_t is a publicly accessible structure that has the same
+    // size and alignment requirements as the real event group structure.  It is
+    // provided as a mechanism for applications to know the size of the event
+    // group (which is dependent on the architecture and configuration file
+    // settings) without breaking the strict data hiding policy by exposing the
+    // real event group internals.  This StaticEventGroup_t variable is passed
+    // into the xSemaphoreCreateEventGroupStatic() function and is used to store
+    // the event group's data structures
+    static StaticEventGroup_t xEventGroupBuffer;
+
+    // Create the event group without dynamically allocating any memory.
+    LMEventGroup = xEventGroupCreateStatic( &xEventGroupBuffer );
+
+    // xQueueBuffer will hold the queue structure.
+    StaticQueue_t xQueueBuffer;
+
+    // ucQueueStorage will hold the items posted to the queue.  Must be at least
+    // [(queue length) * ( queue item size)] bytes long.
+    uint8_t ucQueueStorage[ 20 * sizeof(uint16_t) ];
+
+    LMQueue = xQueueCreateStatic( 20, // The number of items the queue can hold.
+                            sizeof(uint16_t),     // The size of each item in the queue
+                            &( ucQueueStorage[ 0 ] ), // The buffer that will hold the items in the queue.
+                            &xQueueBuffer ); // The buffer that will hold the queue structure.
+}
+
 static int doNetworkSetup(uint16_t *l, uint16_t *c)
 {
     int len = 0;

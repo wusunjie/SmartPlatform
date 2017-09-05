@@ -35,7 +35,13 @@ static void module_init(void)
     for (i = 0; i < (__module_list_end - __module_list_begin); i++) {
         struct module *m = __module_list_begin[i];
         if (m) {
-            xTaskCreateStatic(m->func, m->name, m->stack_depth, NULL, m->priority, m->stack, m->tcb);
+            if (m->init) {
+                m->init();
+            }
+
+            if (m->func) {
+                xTaskCreateStatic(m->func, m->name, m->stack_depth, NULL, m->priority, m->stack, m->tcb);
+            }
         }
     }
 }
