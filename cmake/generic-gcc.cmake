@@ -37,7 +37,7 @@ ENDIF()
 INCLUDE(${STM32_PLATFORM_TOP}/cmake/rtos-freertos.cmake)
 SET(LINK_SCRIPT ${STM32_PLATFORM_TOP}/board/${STM32_PLATFORM_BOARD_NAME}/Script/${STM32_PLATFORM_BOARD_NAME}-freertos.ld)
 
-SET(CMAKE_EXE_LINKER_FLAGS "-L${STM32_PLATFORM_TOP} -Wl,--gc-sections -Wl,-Map,${STM32_PLATFORM_BOARD_NAME}-Platform.map --specs=nosys.specs -T${LINK_SCRIPT}" CACHE INTERNAL "" FORCE)
+SET(CMAKE_EXE_LINKER_FLAGS "-L${STM32_PLATFORM_TOP} -Wl,--gc-sections -Wl,-Map,${STM32_PLATFORM_BOARD_NAME}.map --specs=nosys.specs -T${LINK_SCRIPT}" CACHE INTERNAL "" FORCE)
 SET(CMAKE_C_FLAGS "${ARCH_FLAGS} ${STARTUP_DEFS} -g -Os -flto -ffunction-sections -fdata-sections" CACHE INTERNAL "" FORCE)
 
 # post-process elf files into .hex files:
