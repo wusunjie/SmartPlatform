@@ -298,7 +298,7 @@ static int doNetworkConnect(const char *a, uint16_t p)
                             status++;
                         }
                         else if (strstr(buf, "ERROR")) {
-                            GPS_MODULE_SEND("AT+CIPSTART=\"TCP\",\"120.76.213.49\",56012\r\n");
+                            GPS_MODULE_SEND(strbuf);
                         }
                     }
                     break;
