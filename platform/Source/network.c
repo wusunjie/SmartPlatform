@@ -445,4 +445,6 @@ static int doNetworkShutdown(void)
     }
 
     nstatus = NETWORK_STATUS_DISCONNECTED;
+
+    return 0;
 }
