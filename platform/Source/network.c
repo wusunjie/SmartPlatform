@@ -140,9 +140,9 @@ int NetworkShutdown(void)
     }
 }
 
-MODULE_DEFINE(Network, 1024, 1)
+MODULE_DEFINE(Network, 1024, 2)
 {
-    uint16_t *pxRxedMessage;
+    uint16_t pxRxedMessage;
     int val = 0;
 
     while (1) {
@@ -150,51 +150,31 @@ MODULE_DEFINE(Network, 1024, 1)
         write(DEV_LEDGPIO2_ID, &val, 1);
 
         if( xQueueReceive( LMQueue, &( pxRxedMessage ), ( TickType_t ) portMAX_DELAY ) ) {
-            switch (*pxRxedMessage) {
+            switch (pxRxedMessage) {
                 case 0:
                 {
-                    if (!doNetworkSetup(&lac, &ci)) {
-                        doNetworkResult = 0;
-                    }
-                    else {
-                        doNetworkResult = -1;
-                    }
+                    doNetworkResult = doNetworkSetup(&lac, &ci);
 
                     xEventGroupSetBits(LMEventGroup, BIT_SETUP);
                 }
                 break;
                 case 1:
                 {
-                    if (!doNetworkConnect(addr, port)) {
-                        doNetworkResult = 0;
-                    }
-                    else {
-                        doNetworkResult = -1;
-                    }
+                    doNetworkResult = doNetworkConnect(addr, port);
 
                     xEventGroupSetBits(LMEventGroup, BIT_CONNECT);
                 }
                 break;
                 case 2:
                 {
-                    if (!doNetworkSubmit(rxbuf)) {
-                        doNetworkResult = 0;
-                    }
-                    else {
-                        doNetworkResult = -1;
-                    }
+                    doNetworkResult = doNetworkSubmit(rxbuf);
 
                     xEventGroupSetBits(LMEventGroup, BIT_SUBMIT);
                 }
                 break;
                 case 3:
                 {
-                    if (!doNetworkShutdown()) {
-                        doNetworkResult = 0;
-                    }
-                    else {
-                        doNetworkResult = -1;
-                    }
+                    doNetworkResult = doNetworkShutdown();
 
                     xEventGroupSetBits(LMEventGroup, BIT_SHUTDOWN);
                 }
@@ -389,7 +369,7 @@ static int doNetworkConnect(const char *a, uint16_t p)
 
         int status = 0;
 
-        char strbuf[50] = {0};
+        static char strbuf[50] = {0};
 
         uint16_t retry = 0;
 
@@ -409,7 +389,7 @@ static int doNetworkConnect(const char *a, uint16_t p)
                         case 0:
                         {
                             if (strstr(rxbuf, "CONNECT OK")) {
-                                GPS_MODULE_SEND("AT+CIPTMODE=1");
+                                GPS_MODULE_SEND("AT+CIPTMODE=1\r\n");
                                 status++;
                             }
                             else if (strstr(rxbuf, "ERROR")) {
@@ -425,7 +405,7 @@ static int doNetworkConnect(const char *a, uint16_t p)
                                 return 0;
                             }
                             else if (strstr(rxbuf, "ERROR")) {
-                                GPS_MODULE_SEND("AT+CIPTMODE=1");
+                                GPS_MODULE_SEND("AT+CIPTMODE=1\r\n");
                                 retry++;
                             }
                         }
@@ -468,16 +448,18 @@ static int doNetworkShutdown(void)
 {
     if (NETWORK_STATUS_CONNECTED == nstatus) {
 
-        TickType_t period = portTICK_PERIOD_MS * (xTaskGetTickCount() - last);
+        if (last) {
+            TickType_t period = portTICK_PERIOD_MS * (xTaskGetTickCount() - last);
 
-        if (period < 2000) {
-            vTaskDelay((2000 - period) / portTICK_PERIOD_MS);
+            if (period < 2000) {
+                vTaskDelay((2000 - period) / portTICK_PERIOD_MS);
+            }
         }
 
-        GPS_MODULE_SEND("+++\r\n");
+        GPS_MODULE_SEND("+++");
         /* should not wait the reply:
-           now we can't detect the disconnect from server,
-           we add a \r\n at the end of the command,
+           now we can't detect the disconnect from server.
+
            1. if now is connected, +++ works well.
            2. if now is disconnected, module is ready to accept the next command. */
 
