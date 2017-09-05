@@ -227,9 +227,9 @@ MODULE_INIT_DEFINE(Network)
 
     // ucQueueStorage will hold the items posted to the queue.  Must be at least
     // [(queue length) * ( queue item size)] bytes long.
-    static uint8_t ucQueueStorage[ 20 * sizeof(uint16_t) ];
+    static uint8_t ucQueueStorage[ sizeof(uint16_t) ];
 
-    LMQueue = xQueueCreateStatic( 20, // The number of items the queue can hold.
+    LMQueue = xQueueCreateStatic( 1, // The number of items the queue can hold.
                             sizeof(uint16_t),     // The size of each item in the queue
                             &( ucQueueStorage[ 0 ] ), // The buffer that will hold the items in the queue.
                             &xQueueBuffer ); // The buffer that will hold the queue structure.
@@ -425,16 +425,20 @@ static int doNetworkShutdown(void)
 {
     if (NETWORK_STATUS_CONNECTED == nstatus) {
         vTaskDelay(2000 / portTICK_PERIOD_MS);
-        GPS_MODULE_SEND("+++");
-        if (-1 != read(DEV_GPSCOM_ID, rxbuf, 1024)) {
-            if (strstr(rxbuf, "OK")) {
-                nstatus = NETWORK_STATUS_DISCONNECTED;
-                return 0;
-            }
-        }
-        return -1;
+        GPS_MODULE_SEND("+++\r\n");
+        /* should not wait the reply:
+           now we can't detect the disconnect from server,
+           we add a \r\n at the end of the command,
+           1. if now is connected, +++ works well.
+           2. if now is disconnected, module is ready to accept the next command. */
+
+        // if (-1 != read(DEV_GPSCOM_ID, rxbuf, 1024)) {
+        //     if (strstr(rxbuf, "OK")) {
+        //         nstatus = NETWORK_STATUS_DISCONNECTED;
+        //         return 0;
+        //     }
+        // }
     }
-    else {
-        return 0;
-    }
+
+    nstatus = NETWORK_STATUS_DISCONNECTED;
 }
