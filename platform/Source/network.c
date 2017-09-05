@@ -246,6 +246,8 @@ static int doNetworkSetup(uint16_t *l, uint16_t *c)
 
         char val = 1;
 
+        uint16_t retry = 0;
+
         int status = 0, tmpstatus = 0;
 
         write(DEV_LEDGPIO1_ID, &val, 1);
