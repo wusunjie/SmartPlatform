@@ -84,9 +84,13 @@ int NetworkConnect(const char *a, uint16_t p)
 MODULE_DEFINE(Location, 1024, 1)
 {
     uint16_t *pxRxedMessage;
+    int val = 0;
 
     while (1) {
-        if( xQueueReceive( LMQueue, &( pxRxedMessage ), ( TickType_t ) 10 ) ) {
+
+        write(DEV_LEDGPIO2_ID, &val, 1);
+
+        if( xQueueReceive( LMQueue, &( pxRxedMessage ), ( TickType_t ) portMAX_DELAY ) ) {
             switch (*pxRxedMessage) {
                 case 0:
                 {
@@ -116,6 +120,8 @@ MODULE_DEFINE(Location, 1024, 1)
                 break;
             }
         }
+
+        val = !val;
     }
 
     vTaskSuspend(NULL);
@@ -248,8 +254,6 @@ static int doNetworkSetup(uint16_t *l, uint16_t *c)
                     case 6:
                     {
                         if (strstr(buf, "OK")) {
-                            val = !val;
-                            write(DEV_LEDGPIO2_ID, &val, 1);
                             return 0;
                         }
                         else if (strstr(buf, "ERROR")) {
@@ -273,8 +277,6 @@ static int doNetworkConnect(const char *a, uint16_t p)
 {
     int len = 0;
 
-    char val = 1;
-
     int status = 0;
 
     char strbuf[50] = {0};
@@ -293,8 +295,6 @@ static int doNetworkConnect(const char *a, uint16_t p)
                     {
                         if (strstr(buf, "CONNECT OK")) {
                             GPS_MODULE_SEND("AT+CIPTMODE=1");
-                            val = !val;
-                            write(DEV_LEDGPIO2_ID, &val, 1);
                             status++;
                         }
                         else if (strstr(buf, "ERROR")) {
@@ -305,8 +305,6 @@ static int doNetworkConnect(const char *a, uint16_t p)
                     case 1:
                     {
                         if (strstr(buf, "OK")) {
-                            val = !val;
-                            write(DEV_LEDGPIO2_ID, &val, 1);
                             return 0;
                         }
                         else if (strstr(buf, "ERROR")) {
