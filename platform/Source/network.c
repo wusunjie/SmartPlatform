@@ -4,7 +4,7 @@
 
 #include "boardcfg.h"
 #include "module.h"
-#include "location.h"
+#include "network.h"
 
 #include "task.h"
 #include "event_groups.h"
@@ -81,7 +81,7 @@ int NetworkConnect(const char *a, uint16_t p)
     }
 }
 
-MODULE_DEFINE(Location, 1024, 1)
+MODULE_DEFINE(Network, 1024, 1)
 {
     uint16_t *pxRxedMessage;
     int val = 0;
@@ -127,7 +127,7 @@ MODULE_DEFINE(Location, 1024, 1)
     vTaskSuspend(NULL);
 }
 
-MODULE_INIT_DEFINE(Location)
+MODULE_INIT_DEFINE(Network)
 {
     // StaticEventGroup_t is a publicly accessible structure that has the same
     // size and alignment requirements as the real event group structure.  It is

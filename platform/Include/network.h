@@ -1,5 +1,5 @@
-#ifndef _SMART_PLATFORM_LOCATION_H
-#define _SMART_PLATFORM_LOCATION_H
+#ifndef _SMART_PLATFORM_NETWORK_H
+#define _SMART_PLATFORM_NETWORK_H
 
 #include <stdint.h>
 
