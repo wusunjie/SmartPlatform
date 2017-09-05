@@ -10,6 +10,8 @@
 #include "event_groups.h"
 #include "queue.h"
 
+#define RETRY_MAX     3
+
 #define BIT_SETUP     ( 1 << 0 )
 #define BIT_CONNECT   ( 1 << 1 )
 #define BIT_SUBMIT    ( 1 << 2 )
@@ -209,6 +211,7 @@ MODULE_DEFINE(Network, 1024, 1)
 MODULE_INIT_DEFINE(Network)
 {
     nstatus = NETWORK_STATUS_NREADY;
+
     // StaticEventGroup_t is a publicly accessible structure that has the same
     // size and alignment requirements as the real event group structure.  It is
     // provided as a mechanism for applications to know the size of the event
@@ -237,13 +240,14 @@ MODULE_INIT_DEFINE(Network)
 
 static int doNetworkSetup(uint16_t *l, uint16_t *c)
 {
-    int len = 0;
-
-    char val = 1;
-
-    int status = 0;
-
     if (NETWORK_STATUS_NREADY == nstatus) {
+
+        int len = 0;
+
+        char val = 1;
+
+        int status = 0, tmpstatus = 0;
+
         write(DEV_LEDGPIO1_ID, &val, 1);
 
         vTaskDelay(3000 / portTICK_PERIOD_MS);
@@ -256,6 +260,7 @@ static int doNetworkSetup(uint16_t *l, uint16_t *c)
         while (1) {
             int ll = read(DEV_GPSCOM_ID, rxbuf + len, 1024);
             if (-1 != ll) {
+                tmpstatus = status;
                 len += ll;
                 if (strchr(rxbuf, '\r') || strchr(rxbuf, '\n')) {
                     switch (status) {
@@ -267,6 +272,7 @@ static int doNetworkSetup(uint16_t *l, uint16_t *c)
                             }
                             else if (strstr(rxbuf, "ERROR")) {
                                 GPS_MODULE_SEND("ATE0\r\n");
+                                retry++;
                             }
                         }
                         break;
@@ -278,6 +284,7 @@ static int doNetworkSetup(uint16_t *l, uint16_t *c)
                             }
                             else if (strstr(rxbuf, "ERROR")) {
                                 GPS_MODULE_SEND("AT+CCID\r\n");
+                                retry++;
                             }
                         }
                         break;
@@ -289,6 +296,7 @@ static int doNetworkSetup(uint16_t *l, uint16_t *c)
                             }
                             else if (strstr(rxbuf, "ERROR")) {
                                 GPS_MODULE_SEND("AT+CREG=2\r\n");
+                                retry++;
                             }
                         }
                         break;
@@ -307,6 +315,7 @@ static int doNetworkSetup(uint16_t *l, uint16_t *c)
                             }
                             if (strstr(rxbuf, "ERROR")) {
                                 GPS_MODULE_SEND("AT+CREG?\r\n");
+                                retry++;
                             }
                         }
                         break;
@@ -318,6 +327,7 @@ static int doNetworkSetup(uint16_t *l, uint16_t *c)
                             }
                             else if (strstr(rxbuf, "ERROR")) {
                                 GPS_MODULE_SEND("AT+CGATT=1\r\n");
+                                retry++;
                             }
                         }
                         break;
@@ -329,6 +339,7 @@ static int doNetworkSetup(uint16_t *l, uint16_t *c)
                             }
                             else if (strstr(rxbuf, "ERROR")) {
                                 GPS_MODULE_SEND("AT+CGDCONT=1,\"IP\",\"CMNET\"\r\n");
+                                retry++;
                             }
                         }
                         break;
@@ -340,6 +351,7 @@ static int doNetworkSetup(uint16_t *l, uint16_t *c)
                             }
                             else if (strstr(rxbuf, "ERROR")) {
                                 GPS_MODULE_SEND("AT+CGACT=1,1\r\n");
+                                retry++;
                             }
                         }
                         break;
@@ -350,6 +362,13 @@ static int doNetworkSetup(uint16_t *l, uint16_t *c)
                     len = 0;
                 }
             }
+
+            if (tmpstatus < status) {
+                retry = 0;
+            }
+            else if (retry > RETRY_MAX) {
+                break;
+            }
         }
     }
 
@@ -358,13 +377,18 @@ static int doNetworkSetup(uint16_t *l, uint16_t *c)
 
 static int doNetworkConnect(const char *a, uint16_t p)
 {
-    int len = 0;
-
-    int status = 0;
-
-    char strbuf[50] = {0};
-
     if (NETWORK_STATUS_DISCONNECTED == nstatus) {
+
+        int len = 0;
+
+        int status = 0;
+
+        char strbuf[50] = {0};
+
+        uint16_t retry = 0;
+
+        int tmpstatus = status;
+
         snprintf(strbuf, 50, "AT+CIPSTART=\"TCP\",\"%s\",%d\r\n", a, p);
 
         GPS_MODULE_SEND(strbuf);
@@ -372,6 +396,7 @@ static int doNetworkConnect(const char *a, uint16_t p)
         while (1) {
             int ll = read(DEV_GPSCOM_ID, rxbuf + len, 1024);
             if (-1 != ll) {
+                tmpstatus = status;
                 len += ll;
                 if (strchr(rxbuf, '\r') || strchr(rxbuf, '\n')) {
                     switch (status) {
@@ -383,6 +408,7 @@ static int doNetworkConnect(const char *a, uint16_t p)
                             }
                             else if (strstr(rxbuf, "ERROR")) {
                                 GPS_MODULE_SEND(strbuf);
+                                retry++;
                             }
                         }
                         break;
@@ -394,6 +420,7 @@ static int doNetworkConnect(const char *a, uint16_t p)
                             }
                             else if (strstr(rxbuf, "ERROR")) {
                                 GPS_MODULE_SEND("AT+CIPTMODE=1");
+                                retry++;
                             }
                         }
                         break;
@@ -402,6 +429,13 @@ static int doNetworkConnect(const char *a, uint16_t p)
                     }
                     memset(rxbuf, 0, 1024);
                     len = 0;
+                }
+
+                if (tmpstatus < status) {
+                    retry = 0;
+                }
+                else if (retry > RETRY_MAX) {
+                    break;
                 }
             }
         }
