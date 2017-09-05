@@ -143,11 +143,11 @@ MODULE_INIT_DEFINE(Network)
     LMEventGroup = xEventGroupCreateStatic( &xEventGroupBuffer );
 
     // xQueueBuffer will hold the queue structure.
-    StaticQueue_t xQueueBuffer;
+    static StaticQueue_t xQueueBuffer;
 
     // ucQueueStorage will hold the items posted to the queue.  Must be at least
     // [(queue length) * ( queue item size)] bytes long.
-    uint8_t ucQueueStorage[ 20 * sizeof(uint16_t) ];
+    static uint8_t ucQueueStorage[ 20 * sizeof(uint16_t) ];
 
     LMQueue = xQueueCreateStatic( 20, // The number of items the queue can hold.
                             sizeof(uint16_t),     // The size of each item in the queue
