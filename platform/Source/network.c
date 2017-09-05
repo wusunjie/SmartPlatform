@@ -25,6 +25,8 @@ enum NetworkStatus {
 
 static enum NetworkStatus nstatus = NETWORK_STATUS_NREADY;
 
+static TickType_t last = 0;
+
 static QueueHandle_t LMQueue = NULL;
 
 static EventGroupHandle_t LMEventGroup = NULL;
@@ -211,6 +213,8 @@ MODULE_DEFINE(Network, 1024, 1)
 MODULE_INIT_DEFINE(Network)
 {
     nstatus = NETWORK_STATUS_NREADY;
+
+    last = 0;
 
     // StaticEventGroup_t is a publicly accessible structure that has the same
     // size and alignment requirements as the real event group structure.  It is
@@ -449,8 +453,11 @@ static int doNetworkConnect(const char *a, uint16_t p)
 static int doNetworkSubmit(const char *rq)
 {
     if (NETWORK_STATUS_CONNECTED == nstatus) {
+        int ret = 0;
         GPS_MODULE_SEND(rq);
-        return read(DEV_GPSCOM_ID, rxbuf, 1024);
+        ret = read(DEV_GPSCOM_ID, rxbuf, 1024);
+        last = xTaskGetTickCount();
+        return ret;
     }
     else {
         return -1;
@@ -460,11 +467,13 @@ static int doNetworkSubmit(const char *rq)
 static int doNetworkShutdown(void)
 {
     if (NETWORK_STATUS_CONNECTED == nstatus) {
-        /* FIXME:
-           we should wait 2 seconds since THE LAST TRANSMITION.
-           we should record the time, then determine how long
-           we should wait here. */
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+        TickType_t period = portTICK_PERIOD_MS * (xTaskGetTickCount() - last);
+
+        if (period < 2000) {
+            vTaskDelay((2000 - period) / portTICK_PERIOD_MS);
+        }
+
         GPS_MODULE_SEND("+++\r\n");
         /* should not wait the reply:
            now we can't detect the disconnect from server,
