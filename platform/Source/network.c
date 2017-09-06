@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#include "boardcfg.h"
+#include "module_config.h"
 #include "module.h"
 #include "network.h"
 
@@ -41,7 +41,7 @@ static int doNetworkResult = -1;
 
 static char rxbuf[1024] = {0};
 
-#define GPS_MODULE_SEND(x) write(DEV_GPSCOM_ID, x, strlen(x))
+#define GPS_MODULE_SEND(x) write(MODULE_NETWORK_DEV, x, strlen(x))
 
 static int doNetworkSetup(uint16_t *l, uint16_t *c);
 
@@ -147,7 +147,7 @@ MODULE_DEFINE(Network, 1024, 2)
 
     while (1) {
 
-        write(DEV_LEDGPIO2_ID, &val, 1);
+        write(MODULE_NETWORK_BLINK, &val, 1);
 
         if( xQueueReceive( LMQueue, &( pxRxedMessage ), ( TickType_t ) portMAX_DELAY ) ) {
             switch (pxRxedMessage) {
@@ -234,12 +234,12 @@ static int doNetworkSetup(uint16_t *l, uint16_t *c)
 
         int status = 0, tmpstatus = 0;
 
-        write(DEV_LEDGPIO1_ID, &val, 1);
+        write(MODULE_NETWORK_PWR, &val, 1);
 
         vTaskDelay(3000 / portTICK_PERIOD_MS);
 
         val = 0;
-        write(DEV_LEDGPIO1_ID, &val, 1);
+        write(MODULE_NETWORK_PWR, &val, 1);
 
         GPS_MODULE_SEND("ATE0\r\n");
 
@@ -380,7 +380,7 @@ static int doNetworkConnect(const char *a, uint16_t p)
         GPS_MODULE_SEND(strbuf);
 
         while (1) {
-            int ll = read(DEV_GPSCOM_ID, rxbuf + len, 1024);
+            int ll = read(MODULE_NETWORK_DEV, rxbuf + len, 1024);
             if (-1 != ll) {
                 tmpstatus = status;
                 len += ll;
@@ -435,7 +435,7 @@ static int doNetworkSubmit(const char *rq)
     if (NETWORK_STATUS_CONNECTED == nstatus) {
         int ret = 0;
         GPS_MODULE_SEND(rq);
-        ret = read(DEV_GPSCOM_ID, rxbuf, 1024);
+        ret = read(MODULE_NETWORK_DEV, rxbuf, 1024);
         if (-1 != ret) {
             rxbuf[ret] = '\0';
         }
@@ -466,7 +466,7 @@ static int doNetworkShutdown(void)
            1. if now is connected, +++ works well.
            2. if now is disconnected, module is ready to accept the next command. */
 
-        // if (-1 != read(DEV_GPSCOM_ID, rxbuf, 1024)) {
+        // if (-1 != read(MODULE_NETWORK_DEV, rxbuf, 1024)) {
         //     if (strstr(rxbuf, "OK")) {
         //         nstatus = NETWORK_STATUS_DISCONNECTED;
         //         return 0;

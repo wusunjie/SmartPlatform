@@ -1,6 +1,6 @@
 #include "system.h"
 
-#include "boardcfg.h"
+#include "module_config.h"
 #include "module.h"
 
 #include "FreeRTOS.h"
@@ -18,13 +18,13 @@ static void AppTimerCallback( TimerHandle_t xTimer )
 {
     char val = 0;
 
-    if (read(DEV_LEDGPIO3_ID, &val, 1)) {
+    if (read(MODULE_SYSTEM_BLINK1, &val, 1)) {
         val = !val;
-        write(DEV_LEDGPIO3_ID, &val, 1);
+        write(MODULE_SYSTEM_BLINK1, &val, 1);
     }
-    if (read(DEV_LEDGPIO4_ID, &val, 1)) {
+    if (read(MODULE_SYSTEM_BLINK2, &val, 1)) {
         val = !val;
-        write(DEV_LEDGPIO4_ID, &val, 1);
+        write(MODULE_SYSTEM_BLINK2, &val, 1);
     }
 }
 
