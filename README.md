@@ -7,8 +7,12 @@
 
 ## build
 
-make BOARD_NAME=stm32f4_discovery
+make BOARD_NAME=waveshare
+
+## features
+
+1. gprs network.
 
 ## currently supported board
 
-1. stm32f4_discovery
+1. waveshare
