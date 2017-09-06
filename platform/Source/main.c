@@ -13,19 +13,11 @@ extern struct module *__module_list_end[];
 
 static void AppTimerCallback( TimerHandle_t xTimer );
 static void module_init(void);
+static void SystemLEDBlink(void);
 
 static void AppTimerCallback( TimerHandle_t xTimer )
 {
-    char val = 0;
-
-    if (read(MODULE_SYSTEM_BLINK1, &val, 1)) {
-        val = !val;
-        write(MODULE_SYSTEM_BLINK1, &val, 1);
-    }
-    if (read(MODULE_SYSTEM_BLINK2, &val, 1)) {
-        val = !val;
-        write(MODULE_SYSTEM_BLINK2, &val, 1);
-    }
+    SystemLEDBlink();
 }
 
 static void module_init(void)
@@ -66,4 +58,15 @@ int main(void)
     while (1);
 
     return 0;
+}
+
+static void SystemLEDBlink(void)
+{
+    static char val = 0;
+
+    write(MODULE_SYSTEM_BLINK1, &val, 1);
+
+    write(MODULE_SYSTEM_BLINK2, &val, 1);
+
+    val = !val;
 }
