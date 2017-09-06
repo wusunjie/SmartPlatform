@@ -436,6 +436,9 @@ static int doNetworkSubmit(const char *rq)
         int ret = 0;
         GPS_MODULE_SEND(rq);
         ret = read(DEV_GPSCOM_ID, rxbuf, 1024);
+        if (-1 != ret) {
+            rxbuf[ret] = '\0';
+        }
         last = xTaskGetTickCount();
         return ret;
     }

@@ -15,7 +15,7 @@ MODULE_DEFINE(Test, 200, 1)
 
     NetworkSetup(&lac, &cid);
 
-    NetworkConnect("202.108.35.250", 80);
+    NetworkConnect("118.178.182.135", 8000);
 
     NetworkSubmit("GET /cellid.php?lac=6214&cell_id=54290&token=0d5de1203d28ed4e87cdf2e38224fe62 HTTP/1.1\r\nHost: api.cellid.cn\r\n\r\n", &rsp);
 
