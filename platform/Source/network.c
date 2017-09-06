@@ -25,8 +25,6 @@ enum NetworkStatus {
 
 static enum NetworkStatus nstatus = NETWORK_STATUS_NREADY;
 
-static TickType_t last = 0;
-
 static QueueHandle_t LMQueue = NULL;
 
 static EventGroupHandle_t LMEventGroup = NULL;
@@ -196,8 +194,6 @@ MODULE_DEFINE(Network, 1024, 2)
 MODULE_INIT_DEFINE(Network)
 {
     nstatus = NETWORK_STATUS_NREADY;
-
-    last = 0;
 
     // StaticEventGroup_t is a publicly accessible structure that has the same
     // size and alignment requirements as the real event group structure.  It is
@@ -435,7 +431,6 @@ static int doNetworkSubmit(const char *rq)
         if (-1 != ret) {
             rxbuf[ret] = '\0';
         }
-        last = xTaskGetTickCount();
         return ret;
     }
     else {
@@ -447,27 +442,20 @@ static int doNetworkShutdown(void)
 {
     if (NETWORK_STATUS_CONNECTED == nstatus) {
 
-        if (last) {
-            TickType_t period = portTICK_PERIOD_MS * (xTaskGetTickCount() - last);
-
-            if (period < 3000) {
-                vTaskDelay((3000 - period) / portTICK_PERIOD_MS);
-            }
-        }
+        vTaskDelay(3000 / portTICK_PERIOD_MS);
 
         GPRS_MODULE_SEND("+++");
-        /* should not wait the reply:
-           now we can't detect the disconnect from server.
 
-           1. if now is connected, +++ works well.
-           2. if now is disconnected, module is ready to accept the next command. */
+        if (-1 != GPRS_MODULE_RECV(rxbuf)) {
+            if (strstr(rxbuf, "OK")) {
+                GPRS_MODULE_SEND("AT+CIPCLOSE\r\n");
+                /* should not wait the reply:
+                   now we can't detect the disconnect from server.
 
-        // if (-1 != GPRS_MODULE_RECV(rxbuf)) {
-        //     if (strstr(rxbuf, "OK")) {
-        //         nstatus = NETWORK_STATUS_DISCONNECTED;
-        //         return 0;
-        //     }
-        // }
+                   1. if now is connected, AT+CIPCLOSE\r\n works well.
+                   2. if now is disconnected, module is ready to accept the next command. */
+            }
+        }
     }
 
     nstatus = NETWORK_STATUS_DISCONNECTED;
