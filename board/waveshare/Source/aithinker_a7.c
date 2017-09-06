@@ -48,7 +48,7 @@ static DMA_HandleTypeDef hdma_rx;
 static TaskHandle_t cur = NULL;
 static __IO uint16_t rxtxXferCount = 0;
 
-DEVICE_DEFINE(gpscom, DEV_GPSCOM_ID);
+DEVICE_DEFINE(AiThinkerA7, DEV_AITHINKER_A7_ID);
 
 /* Exported functions ------------------------------------------------------- */
 
@@ -180,7 +180,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
     HAL_NVIC_DisableIRQ(USARTx_DMA_RX_IRQn);
 }
 
-DEVICE_FUNC_DEFINE_OPEN(gpscom)
+DEVICE_FUNC_DEFINE_OPEN(AiThinkerA7)
 {
     UartHandle.Instance          = USARTx;
 
@@ -195,12 +195,12 @@ DEVICE_FUNC_DEFINE_OPEN(gpscom)
     HAL_UART_Init(&UartHandle);
 }
 
-DEVICE_FUNC_DEFINE_CLOSE(gpscom)
+DEVICE_FUNC_DEFINE_CLOSE(AiThinkerA7)
 {
     HAL_UART_DeInit(&UartHandle);
 }
 
-DEVICE_FUNC_DEFINE_WRITE(gpscom)
+DEVICE_FUNC_DEFINE_WRITE(AiThinkerA7)
 {
     if (!len) {
         return -1;
@@ -236,7 +236,7 @@ DEVICE_FUNC_DEFINE_WRITE(gpscom)
     return len;
 }
 
-DEVICE_FUNC_DEFINE_READ(gpscom)
+DEVICE_FUNC_DEFINE_READ(AiThinkerA7)
 {
     if (!len) {
         return -1;
