@@ -350,7 +350,11 @@ static int doNetworkSetup(uint16_t *l, uint16_t *c)
         }
     }
 
-    return -1;
+    if (NETWORK_STATUS_NREADY == nstatus) {
+        return -1;
+    }
+
+    return 0;
 }
 
 static int doNetworkConnect(const char *a, uint16_t p)
@@ -419,6 +423,10 @@ static int doNetworkConnect(const char *a, uint16_t p)
         }
     }
 
+    if (NETWORK_STATUS_CONNECTED == status) {
+        return 0;
+    }
+
     return -1;
 }
 
@@ -458,7 +466,9 @@ static int doNetworkShutdown(void)
         }
     }
 
-    nstatus = NETWORK_STATUS_DISCONNECTED;
+    if (NETWORK_STATUS_NREADY != nstatus) {
+        nstatus = NETWORK_STATUS_DISCONNECTED;
+    }
 
     return 0;
 }
