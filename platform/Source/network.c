@@ -423,7 +423,7 @@ static int doNetworkConnect(const char *a, uint16_t p)
         }
     }
 
-    if (NETWORK_STATUS_CONNECTED == status) {
+    if (NETWORK_STATUS_CONNECTED == nstatus) {
         return 0;
     }
 
