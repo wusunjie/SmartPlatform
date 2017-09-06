@@ -450,8 +450,8 @@ static int doNetworkShutdown(void)
         if (last) {
             TickType_t period = portTICK_PERIOD_MS * (xTaskGetTickCount() - last);
 
-            if (period < 2000) {
-                vTaskDelay((2000 - period) / portTICK_PERIOD_MS);
+            if (period < 3000) {
+                vTaskDelay((3000 - period) / portTICK_PERIOD_MS);
             }
         }
 
