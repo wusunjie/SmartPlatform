@@ -253,7 +253,7 @@ static int doNetworkSetup(void)
                         case 1:
                         {
                             if (strstr(rxbuf, "OK")) {
-                                GPRS_MODULE_SEND("AT+CREG=1\r\n");
+                                GPRS_MODULE_SEND("AT+CREG=2\r\n");
                                 status++;
                             }
                             else if (strstr(rxbuf, "ERROR")) {
