@@ -2,16 +2,13 @@
 
 #include "network.h"
 
-#include "FreeRTOS.h"
-#include "task.h"
-
 #include <stdint.h>
 
 MODULE_DEFINE(Test, 200, 1)
 {
-	uint16_t lac = 0, cid = 0;
+    uint16_t lac = 0, cid = 0;
 
-	char *rsp = NULL;
+    char *rsp = NULL;
 
     NetworkSetup(&lac, &cid);
 
