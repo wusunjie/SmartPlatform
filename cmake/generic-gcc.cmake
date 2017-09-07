@@ -31,7 +31,7 @@ ENDIF()
 
 IF(STM32_PLATFORM_BUILD_APP STREQUAL "false")
     INCLUDE_DIRECTORIES(${STM32_PLATFORM_TOP}/board/common/Include)
-    LIST(APPEND SRC_LIST ${STM32_PLATFORM_TOP}/board/common/Source/retarget.c)
+    AUX_SOURCE_DIRECTORY(${STM32_PLATFORM_TOP}/board/common/Source SRC_LIST)
 ENDIF()
 
 INCLUDE(${STM32_PLATFORM_TOP}/cmake/rtos-freertos.cmake)

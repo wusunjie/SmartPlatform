@@ -2,6 +2,9 @@
 
 #include "network.h"
 
+#include "FreeRTOS.h"
+#include "task.h"
+
 #include <stdint.h>
 
 MODULE_DEFINE(Test, 200, 1)
