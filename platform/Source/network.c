@@ -29,8 +29,6 @@ static QueueHandle_t LMQueue = NULL;
 
 static EventGroupHandle_t LMEventGroup = NULL;
 
-static uint16_t lac = 0, ci = 0;
-
 static char addr[20] = {0};
 
 static uint16_t port = 0;
@@ -43,7 +41,7 @@ static char rxbuf[1024] = {0};
 
 #define GPRS_MODULE_RECV(x) read(MODULE_NETWORK_DEV, x, 1024)
 
-static int doNetworkSetup(uint16_t *l, uint16_t *c);
+static int doNetworkSetup(void);
 
 static int doNetworkConnect(const char *a, uint16_t p);
 
@@ -55,7 +53,7 @@ static void GPRS_ModulePwron(void);
 
 static void GPRS_ModuleBlink(void);
 
-int NetworkSetup(uint16_t *l, uint16_t *c)
+int NetworkSetup(void)
 {
     uint16_t type = 0;
 
@@ -68,8 +66,6 @@ int NetworkSetup(uint16_t *l, uint16_t *c)
     uxBits = xEventGroupWaitBits(LMEventGroup, BIT_SETUP, pdTRUE, pdTRUE, portMAX_DELAY);
 
     if( ( uxBits & BIT_SETUP ) != 0 ) {
-        *l = lac;
-        *c = ci;
         return doNetworkResult;
     }
     else {
@@ -156,7 +152,7 @@ MODULE_DEFINE(Network, 1024, 2)
             switch (pxRxedMessage) {
                 case 0:
                 {
-                    doNetworkResult = doNetworkSetup(&lac, &ci);
+                    doNetworkResult = doNetworkSetup();
 
                     xEventGroupSetBits(LMEventGroup, BIT_SETUP);
                 }
@@ -221,7 +217,7 @@ MODULE_INIT_DEFINE(Network)
                             &xQueueBuffer ); // The buffer that will hold the queue structure.
 }
 
-static int doNetworkSetup(uint16_t *l, uint16_t *c)
+static int doNetworkSetup(void)
 {
     if (NETWORK_STATUS_NREADY == nstatus) {
 
@@ -257,7 +253,7 @@ static int doNetworkSetup(uint16_t *l, uint16_t *c)
                         case 1:
                         {
                             if (strstr(rxbuf, "OK")) {
-                                GPRS_MODULE_SEND("AT+CREG=2\r\n");
+                                GPRS_MODULE_SEND("AT+CREG=1\r\n");
                                 status++;
                             }
                             else if (strstr(rxbuf, "ERROR")) {
@@ -269,35 +265,16 @@ static int doNetworkSetup(uint16_t *l, uint16_t *c)
                         case 2:
                         {
                             if (strstr(rxbuf, "OK")) {
-                                GPRS_MODULE_SEND("AT+CREG?\r\n");
+                                GPRS_MODULE_SEND("AT+CGATT=1\r\n");
                                 status++;
                             }
                             else if (strstr(rxbuf, "ERROR")) {
-                                GPRS_MODULE_SEND("AT+CREG=2\r\n");
+                                GPRS_MODULE_SEND("AT+CREG=1\r\n");
                                 retry++;
                             }
                         }
                         break;
                         case 3:
-                        {
-                            int n = -1, stat = -1;
-                            int ret = sscanf(rxbuf, "%*[^+]+CREG: %d,%d,\"%hx\",\"%hx\"", &n, &stat, l, c);
-                            if (ret >= 2) {
-                                if (2 == n) {
-                                    if (1 == stat) {
-                                        GPRS_MODULE_SEND("AT+CGATT=1\r\n");
-                                        status++;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (strstr(rxbuf, "ERROR")) {
-                                GPRS_MODULE_SEND("AT+CREG?\r\n");
-                                retry++;
-                            }
-                        }
-                        break;
-                        case 4:
                         {
                             if (strstr(rxbuf, "OK")) {
                                 GPRS_MODULE_SEND("AT+CGDCONT=1,\"IP\",\"CMNET\"\r\n");
@@ -309,7 +286,7 @@ static int doNetworkSetup(uint16_t *l, uint16_t *c)
                             }
                         }
                         break;
-                        case 5:
+                        case 4:
                         {
                             if (strstr(rxbuf, "OK")) {
                                 GPRS_MODULE_SEND("AT+CGACT=1,1\r\n");
@@ -321,7 +298,7 @@ static int doNetworkSetup(uint16_t *l, uint16_t *c)
                             }
                         }
                         break;
-                        case 6:
+                        case 5:
                         {
                             if (strstr(rxbuf, "OK")) {
                                 nstatus = NETWORK_STATUS_DISCONNECTED;

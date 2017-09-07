@@ -13,7 +13,7 @@ MODULE_DEFINE(Test, 200, 1)
 
     char *rsp = NULL;
 
-    NetworkSetup(&lac, &cid);
+    NetworkSetup();
 
     NetworkConnect("118.178.182.135", 8000);
 

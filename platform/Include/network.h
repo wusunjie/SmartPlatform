@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-extern int NetworkSetup(uint16_t *l, uint16_t *c);
+extern int NetworkSetup(void);
 
 extern int NetworkConnect(const char *a, uint16_t p);
 
