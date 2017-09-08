@@ -33,10 +33,11 @@
 #ifndef __SYS_ARCH_H__
 #define __SYS_ARCH_H__
 
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/queue.h"
-#include "freertos/semphr.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,9 +69,9 @@ typedef struct sys_mbox_s {
 #define sys_sem_set_invalid( x ) ( ( *x ) = NULL )
 
 void sys_delay_ms(uint32_t ms);
-sys_sem_t* sys_thread_sem_init(void);
-void sys_thread_sem_deinit(void);
-sys_sem_t* sys_thread_sem_get(void);
+// sys_sem_t* sys_thread_sem_init(void);
+// void sys_thread_sem_deinit(void);
+// sys_sem_t* sys_thread_sem_get(void);
 
 #ifdef __cplusplus
 }

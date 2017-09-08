@@ -101,7 +101,7 @@
  * MEMP_NUM_NETCONN: the number of struct netconns.
  * (only needed if you use the sequential API, like api_lib.c)
  */
-#define MEMP_NUM_NETCONN                CONFIG_LWIP_MAX_SOCKETS
+#define MEMP_NUM_NETCONN                1
 
 /**
  * MEMP_NUM_RAW_PCB: Number of raw connection PCBs
@@ -152,14 +152,14 @@
  * this option does not affect outgoing packet sizes, which can be controlled
  * via IP_FRAG.
  */
-#define IP_REASSEMBLY                   CONFIG_LWIP_IP_REASSEMBLY
+#define IP_REASSEMBLY                   1
 
 /**
  * IP_FRAG==1: Fragment outgoing IP packets if their size exceeds MTU. Note
  * that this option does not affect incoming packet sizes, which can be
  * controlled via IP_REASSEMBLY.
  */
-#define IP_FRAG                         CONFIG_LWIP_IP_FRAG
+#define IP_FRAG                         1
 
 /**
  * IP_REASS_MAXAGE: Maximum time (in multiples of IP_TMR_INTERVAL - so seconds, normally)
@@ -182,9 +182,9 @@
    ----------------------------------
 */
 
-#define LWIP_BROADCAST_PING CONFIG_LWIP_BROADCAST_PING
+#define LWIP_BROADCAST_PING              0
 
-#define LWIP_MULTICAST_PING CONFIG_LWIP_MULTICAST_PING
+#define LWIP_MULTICAST_PING              0
 
 /*
    ---------------------------------
@@ -282,7 +282,7 @@
  * TCP_QUEUE_OOSEQ==1: TCP will queue segments that arrive out of order.
  * Define to 0 if your device is low on memory.
  */
-#define TCP_QUEUE_OOSEQ                 CONFIG_TCP_QUEUE_OOSEQ
+#define TCP_QUEUE_OOSEQ                 0
 
 /*
  *     LWIP_EVENT_API==1: The user defines lwip_tcp_event() to receive all
@@ -290,22 +290,22 @@
  *     LWIP_CALLBACK_API==1: The PCB callback function is called directly
  *         for the event. This is the default.
 */
-#define TCP_MSS                         CONFIG_TCP_MSS
+#define TCP_MSS                         1460
 
 /**
  * TCP_MSL: The maximum segment lifetime in milliseconds
  */
-#define TCP_MSL                         CONFIG_TCP_MSL
+// #define TCP_MSL                         CONFIG_TCP_MSL
 
 /**
  * TCP_MAXRTX: Maximum number of retransmissions of data segments.
  */
-#define TCP_MAXRTX                      CONFIG_TCP_MAXRTX
+// #define TCP_MAXRTX                      CONFIG_TCP_MAXRTX
 
 /**
  * TCP_SYNMAXRTX: Maximum number of retransmissions of SYN segments.
  */
-#define TCP_SYNMAXRTX                   CONFIG_TCP_SYNMAXRTX
+// #define TCP_SYNMAXRTX                   CONFIG_TCP_SYNMAXRTX
 
 /**
  * TCP_LISTEN_BACKLOG: Enable the backlog option for tcp listen pcb.
@@ -317,15 +317,15 @@
  * TCP_OVERSIZE: The maximum number of bytes that tcp_write may
  * allocate ahead of time
  */
-#ifdef CONFIG_TCP_OVERSIZE_MSS
-#define TCP_OVERSIZE                    TCP_MSS
-#endif
-#ifdef CONFIG_TCP_OVERSIZE_QUARTER_MSS
+// #ifdef CONFIG_TCP_OVERSIZE_MSS
+// #define TCP_OVERSIZE                    TCP_MSS
+// #endif
+// #ifdef CONFIG_TCP_OVERSIZE_QUARTER_MSS
 #define TCP_OVERSIZE                    (TCP_MSS/4)
-#endif
-#ifdef CONFIG_TCP_OVERSIZE_DISABLE
-#define TCP_OVERSIZE                    0
-#endif
+// #endif
+// #ifdef CONFIG_TCP_OVERSIZE_DISABLE
+// #define TCP_OVERSIZE                    0
+// #endif
 #ifndef TCP_OVERSIZE
 #error "One of CONFIG_TCP_OVERSIZE_xxx options should be set by sdkconfig"
 #endif
@@ -364,7 +364,7 @@
    ---------- LOOPIF options ----------
    ------------------------------------
 */
-#if CONFIG_MDNS
+#if 0
 /**
  * LWIP_NETIF_LOOPBACK==1: Support sending packets with a destination IP
  * address equal to the netif IP address, looping them back up the stack.
@@ -399,14 +399,14 @@
  * The stack size value itself is platform-dependent, but is passed to
  * sys_thread_new() when the thread is created.
  */
-#define TCPIP_THREAD_STACKSIZE          ESP_TASK_TCPIP_STACK
+#define TCPIP_THREAD_STACKSIZE          1024
 
 /**
  * TCPIP_THREAD_PRIO: The priority assigned to the main tcpip thread.
  * The priority value itself is platform-dependent, but is passed to
  * sys_thread_new() when the thread is created.
  */
-#define TCPIP_THREAD_PRIO               ESP_TASK_TCPIP_PRIO
+#define TCPIP_THREAD_PRIO               1
 
 /**
  * TCPIP_MBOX_SIZE: The mailbox size for the tcpip thread messages
@@ -420,14 +420,14 @@
  * NETCONN_UDP. The queue size value itself is platform-dependent, but is passed
  * to sys_mbox_new() when the recvmbox is created.
  */
-#define DEFAULT_UDP_RECVMBOX_SIZE       CONFIG_UDP_RECVMBOX_SIZE
+#define DEFAULT_UDP_RECVMBOX_SIZE       50
 
 /**
  * DEFAULT_TCP_RECVMBOX_SIZE: The mailbox size for the incoming packets on a
  * NETCONN_TCP. The queue size value itself is platform-dependent, but is passed
  * to sys_mbox_new() when the recvmbox is created.
  */
-#define DEFAULT_TCP_RECVMBOX_SIZE       CONFIG_TCP_RECVMBOX_SIZE
+#define DEFAULT_TCP_RECVMBOX_SIZE       50
 
 /**
  * DEFAULT_ACCEPTMBOX_SIZE: The mailbox size for the incoming connections.
@@ -441,21 +441,21 @@
  * The stack size value itself is platform-dependent, but is passed to
  * sys_thread_new() when the thread is created.
  */
-#define DEFAULT_THREAD_STACKSIZE        TCPIP_THREAD_STACKSIZE
+// #define DEFAULT_THREAD_STACKSIZE        TCPIP_THREAD_STACKSIZE
 
 /**
  * DEFAULT_THREAD_PRIO: The priority assigned to any other lwIP thread.
  * The priority value itself is platform-dependent, but is passed to
  * sys_thread_new() when the thread is created.
  */
-#define DEFAULT_THREAD_PRIO             TCPIP_THREAD_PRIO
+// #define DEFAULT_THREAD_PRIO             TCPIP_THREAD_PRIO
 
 /**
  * DEFAULT_RAW_RECVMBOX_SIZE: The mailbox size for the incoming packets on a
  * NETCONN_RAW. The queue size value itself is platform-dependent, but is passed
  * to sys_mbox_new() when the recvmbox is created.
  */
-#define DEFAULT_RAW_RECVMBOX_SIZE       6
+// #define DEFAULT_RAW_RECVMBOX_SIZE       6
 
 /*
    ----------------------------------------------
@@ -495,15 +495,15 @@
 /**
  * LWIP_SO_RCVBUF==1: Enable SO_RCVBUF processing.
  */
-#define LWIP_SO_RCVBUF                  CONFIG_LWIP_SO_RCVBUF
+#define LWIP_SO_RCVBUF                  1
 
 /**
  * SO_REUSE==1: Enable SO_REUSEADDR option.
  * This option is set via menuconfig.
  */
-#define SO_REUSE                        CONFIG_LWIP_SO_REUSE
+#define SO_REUSE                        1
 
-#if CONFIG_MDNS
+#if 0
 /**
  * SO_REUSE_RXTOALL==1: Pass a copy of incoming broadcast/multicast packets
  * to all local matches if SO_REUSEADDR is turned on.
@@ -531,29 +531,29 @@
 /**
  * PPP_SUPPORT==1: Enable PPP.
  */
-#define PPP_SUPPORT                     CONFIG_PPP_SUPPORT
+#define PPP_SUPPORT                     1
 
 #if PPP_SUPPORT
 
 /**
  * PAP_SUPPORT==1: Support PAP.
  */
-#define PAP_SUPPORT                     CONFIG_PPP_PAP_SUPPORT
+#define PAP_SUPPORT                     1
 
 /**
  * CHAP_SUPPORT==1: Support CHAP.
  */
-#define CHAP_SUPPORT                    CONFIG_PPP_CHAP_SUPPORT
+#define CHAP_SUPPORT                    1
 
 /**
  * MSCHAP_SUPPORT==1: Support MSCHAP.
  */
-#define MSCHAP_SUPPORT                  CONFIG_PPP_MSCHAP_SUPPORT
+#define MSCHAP_SUPPORT                  1
 
 /**
  * CCP_SUPPORT==1: Support CCP.
  */
-#define MPPE_SUPPORT                    CONFIG_PPP_MPPE_SUPPORT
+#define MPPE_SUPPORT                    1
 
 /**
  * PPP_MAXIDLEFLAG: Max Xmit idle time (in ms) before resend flag char.
@@ -568,7 +568,7 @@
 /**
  * PPP_DEBUG: Enable debugging for PPP.
  */
-#define PPP_DEBUG_ON					CONFIG_PPP_DEBUG_ON
+#define PPP_DEBUG_ON					       0
 
 #if PPP_DEBUG_ON
 #define PPP_DEBUG                       LWIP_DBG_ON
@@ -599,7 +599,7 @@
    ---------- Hook options ---------------
    ---------------------------------------
 */
-#define LWIP_HOOK_IP4_ROUTE_SRC         ip4_route_src_hook
+// #define LWIP_HOOK_IP4_ROUTE_SRC         ip4_route_src_hook
 
 /*
    ---------------------------------------
@@ -677,32 +677,16 @@
  * DHCP_DEBUG: Enable debugging in dhcp.c.
  */
 #define DHCP_DEBUG                      LWIP_DBG_OFF
-#define LWIP_DEBUG                      LWIP_DBG_OFF
+// #define LWIP_DEBUG                      LWIP_DBG_OFF
 #define TCP_DEBUG                       LWIP_DBG_OFF
 
 #define CHECKSUM_CHECK_UDP              0
 #define CHECKSUM_CHECK_IP               0
 
 #define LWIP_NETCONN_FULLDUPLEX         1
-#define LWIP_NETCONN_SEM_PER_THREAD     1
+#define LWIP_NETCONN_SEM_PER_THREAD     0
 
-#define LWIP_DHCP_MAX_NTP_SERVERS       CONFIG_LWIP_DHCP_MAX_NTP_SERVERS
+// #define LWIP_DHCP_MAX_NTP_SERVERS       CONFIG_LWIP_DHCP_MAX_NTP_SERVERS
 #define LWIP_TIMEVAL_PRIVATE            0
-
-#define SNTP_SET_SYSTEM_TIME_US(sec, us)  \
-    do { \
-        struct timeval tv = { .tv_sec = sec, .tv_usec = us }; \
-        settimeofday(&tv, NULL); \
-    } while (0);
-
-#define SNTP_GET_SYSTEM_TIME(sec, us) \
-    do { \
-        struct timeval tv = { .tv_sec = 0, .tv_usec = 0 }; \
-        gettimeofday(&tv, NULL); \
-        (sec) = tv.tv_sec;  \
-        (us) = tv.tv_usec; \
-    } while (0);
-
-#define SOC_SEND_LOG //printf
 
 #endif /* __LWIPOPTS_H__ */

@@ -38,7 +38,6 @@
 #include "lwip/mem.h"
 #include "arch/sys_arch.h"
 #include "lwip/stats.h"
-#include "esp_log.h"
 
 /* This is the number of threads that can be started with sys_thread_new() */
 #define SYS_THREAD_MAX 4
@@ -371,7 +370,7 @@ sys_mbox_free(sys_mbox_t *mbox)
         if (post_null){
             LWIP_DEBUGF(ESP_THREAD_SAFE_DEBUG, ("sys_mbox_free: post null to mbox\n"));
             if (sys_mbox_trypost( mbox, NULL) != ERR_OK){
-                ESP_STATS_DROP_INC(esp.free_mbox_post_fail);
+                // ESP_STATS_DROP_INC(esp.free_mbox_post_fail);
                 LWIP_DEBUGF(ESP_THREAD_SAFE_DEBUG, ("sys_mbox_free: post null mbox fail\n"));
             } else {
                 post_null = false;
@@ -380,7 +379,7 @@ sys_mbox_free(sys_mbox_t *mbox)
         }
 
         if (count == (MAX_POLL_CNT-1)){
-            ESP_LOGW(TAG, "WARNING: mbox %p had a consumer who never unblocked. Leaking!\n", (*mbox)->os_mbox);
+            // ESP_LOGW(TAG, "WARNING: mbox %p had a consumer who never unblocked. Leaking!\n", (*mbox)->os_mbox);
         }
         sys_delay_ms(PER_POLL_DELAY);
     }
@@ -427,7 +426,7 @@ void
 sys_init(void)
 {
     if (ERR_OK != sys_mutex_new(&g_lwip_protect_mutex)) {
-        ESP_LOGE(TAG, "sys_init: failed to init lwip protect mutex\n");
+        // ESP_LOGE(TAG, "sys_init: failed to init lwip protect mutex\n");
     }
 }
 
@@ -477,66 +476,66 @@ sys_arch_unprotect(sys_prot_t pval)
     sys_mutex_unlock(&g_lwip_protect_mutex);
 }
 
-#define SYS_TLS_INDEX CONFIG_LWIP_THREAD_LOCAL_STORAGE_INDEX
-/* 
- * get per thread semphore
- */
-sys_sem_t* sys_thread_sem_get(void)
-{
-    sys_sem_t *sem = (sys_sem_t*)pvTaskGetThreadLocalStoragePointer(xTaskGetCurrentTaskHandle(), SYS_TLS_INDEX);
-    if (!sem){
-    sem = sys_thread_sem_init();
-    }
-    LWIP_DEBUGF(ESP_THREAD_SAFE_DEBUG, ("sem_get s=%p\n", sem));
-    return sem;
-}
+// #define SYS_TLS_INDEX CONFIG_LWIP_THREAD_LOCAL_STORAGE_INDEX
+// /* 
+//  * get per thread semphore
+//  */
+// sys_sem_t* sys_thread_sem_get(void)
+// {
+//     sys_sem_t *sem = (sys_sem_t*)pvTaskGetThreadLocalStoragePointer(xTaskGetCurrentTaskHandle(), SYS_TLS_INDEX);
+//     if (!sem){
+//     sem = sys_thread_sem_init();
+//     }
+//     LWIP_DEBUGF(ESP_THREAD_SAFE_DEBUG, ("sem_get s=%p\n", sem));
+//     return sem;
+// }
 
-static void sys_thread_tls_free(int index, void* data)
-{
-    sys_sem_t *sem = (sys_sem_t*)(data);
+// static void sys_thread_tls_free(int index, void* data)
+// {
+//     sys_sem_t *sem = (sys_sem_t*)(data);
 
-    if (sem && *sem){
-    LWIP_DEBUGF(ESP_THREAD_SAFE_DEBUG, ("sem del, i=%d sem=%p\n", index, *sem));
-    vSemaphoreDelete(*sem);
-    }
+//     if (sem && *sem){
+//     LWIP_DEBUGF(ESP_THREAD_SAFE_DEBUG, ("sem del, i=%d sem=%p\n", index, *sem));
+//     vSemaphoreDelete(*sem);
+//     }
 
-    if (sem){
-    LWIP_DEBUGF(ESP_THREAD_SAFE_DEBUG, ("sem pointer del, i=%d sem_p=%p\n", index, sem));
-    free(sem);
-    }
-}
+//     if (sem){
+//     LWIP_DEBUGF(ESP_THREAD_SAFE_DEBUG, ("sem pointer del, i=%d sem_p=%p\n", index, sem));
+//     free(sem);
+//     }
+// }
 
-sys_sem_t* sys_thread_sem_init(void)
-{
-    sys_sem_t *sem = (sys_sem_t*)malloc(sizeof(sys_sem_t*));
+// sys_sem_t* sys_thread_sem_init(void)
+// {
+//     sys_sem_t *sem = (sys_sem_t*)malloc(sizeof(sys_sem_t*));
 
-    if (!sem){
-    ESP_LOGE(TAG, "thread_sem_init: out of memory");
-    return 0;
-    }
+//     if (!sem){
+//     ESP_LOGE(TAG, "thread_sem_init: out of memory");
+//     return 0;
+//     }
 
-    *sem = xSemaphoreCreateBinary();
-    if (!(*sem)){
-    free(sem);
-    ESP_LOGE(TAG, "thread_sem_init: out of memory");
-    return 0;
-    }
+//     *sem = xSemaphoreCreateBinary();
+//     if (!(*sem)){
+//     free(sem);
+//     ESP_LOGE(TAG, "thread_sem_init: out of memory");
+//     return 0;
+//     }
 
-    LWIP_DEBUGF(ESP_THREAD_SAFE_DEBUG, ("sem init sem_p=%p sem=%p cb=%p\n", sem, *sem, sys_thread_tls_free));
-    vTaskSetThreadLocalStoragePointerAndDelCallback(xTaskGetCurrentTaskHandle(), SYS_TLS_INDEX, sem, (TlsDeleteCallbackFunction_t)sys_thread_tls_free);
+//     LWIP_DEBUGF(ESP_THREAD_SAFE_DEBUG, ("sem init sem_p=%p sem=%p cb=%p\n", sem, *sem, sys_thread_tls_free));
+//     vTaskSetThreadLocalStoragePointerAndDelCallback(xTaskGetCurrentTaskHandle(), SYS_TLS_INDEX, sem, (TlsDeleteCallbackFunction_t)sys_thread_tls_free);
 
-    return sem;
-}
+//     return sem;
+// }
 
-void sys_thread_sem_deinit(void)
-{
-    sys_sem_t *sem = (sys_sem_t*)pvTaskGetThreadLocalStoragePointer(xTaskGetCurrentTaskHandle(), SYS_TLS_INDEX);
+// void sys_thread_sem_deinit(void)
+// {
+//     sys_sem_t *sem = (sys_sem_t*)pvTaskGetThreadLocalStoragePointer(xTaskGetCurrentTaskHandle(), SYS_TLS_INDEX);
 
-    sys_thread_tls_free(SYS_TLS_INDEX, (void*)sem);
-    vTaskSetThreadLocalStoragePointerAndDelCallback(xTaskGetCurrentTaskHandle(), SYS_TLS_INDEX, 0, 0);
+//     sys_thread_tls_free(SYS_TLS_INDEX, (void*)sem);
+//     vTaskSetThreadLocalStoragePointerAndDelCallback(xTaskGetCurrentTaskHandle(), SYS_TLS_INDEX, 0, 0);
 
-    return;
-}
+//     return;
+// }
 
 void sys_delay_ms(uint32_t ms)
 {

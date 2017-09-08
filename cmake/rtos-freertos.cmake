@@ -1,7 +1,7 @@
 INCLUDE_DIRECTORIES(${STM32_PLATFORM_TOP}/freertos/Source/include)
 
 AUX_SOURCE_DIRECTORY(${STM32_PLATFORM_TOP}/freertos/Source SRC_LIST)
-# LIST(APPEND SRC_LIST ${STM32_PLATFORM_TOP}/freertos/Source/portable/Common/heap_4.c)
+LIST(APPEND SRC_LIST ${STM32_PLATFORM_TOP}/freertos/Source/portable/Common/heap_3.c)
 
 IF(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
     INCLUDE_DIRECTORIES(${STM32_PLATFORM_TOP}/freertos/Source/portable/ARM_CM4F)
