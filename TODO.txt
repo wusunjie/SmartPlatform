@@ -1,0 +1,5 @@
+1. add lwip to support ppp on gprs modem.
+2. make gprs modem setup sequence more flexible.
+3. move common part of driver out of device driver.
+4. add nmea sentence parse for gps module.
+5. add low comsumption support for platform.
