@@ -23,6 +23,73 @@ enum NetworkStatus {
     NETWORK_STATUS_CONNECTED,
 };
 
+struct gprscmd {
+    const char *cmd;
+    uint16_t len;
+    const char *rsp;
+    uint32_t timeout;
+};
+
+struct dialchart {
+    const char *abort[10];
+    struct gprscmd *cmdlist;
+    uint16_t len;
+    uint16_t retry;
+};
+
+static struct gprscmd cmds[] = {
+    {
+        .cmd = "AT\r\n",
+        .len = sizeof("AT\r\n") - 1,
+        .rsp = "OK",
+        .timeout = 3000
+    },
+    {
+        .cmd = "ATE0\r\n",
+        .len = sizeof("ATE0\r\n") - 1,
+        .rsp = "OK",
+        .timeout = 3000
+    },
+    {
+        .cmd = "AT+CPIN?\r\n",
+        .len = sizeof("AT+CPIN?\r\n") - 1,
+        .rsp = "CPIN: READY",
+        .timeout = 3000
+    },
+    {
+        .cmd = "AT+CGDCONT=1,\"IP\",\"CMNET\"\r\n",
+        .len = sizeof("AT+CGDCONT=1,\"IP\",\"CMNET\"\r\n") - 1,
+        .rsp = "OK",
+        .timeout = 3000
+    },
+    {
+        .cmd = "AT+CGATT=1\r\n",
+        .len = sizeof("AT+CGATT=1\r\n") - 1,
+        .rsp = "OK",
+        .timeout = 3000
+    },
+    {
+        .cmd = "AT+CGACT=1,1\r\n",
+        .len = sizeof("AT+CGACT=1,1\r\n") - 1,
+        .rsp = "OK",
+        .timeout = 3000
+    }
+};
+
+static struct dialchart dials = {
+    .abort = {
+        "NO CARRIER",
+        "ERROR",
+        "NO DIALTONE",
+        "BUSY",
+        "NO ANSWER",
+        NULL
+    },
+    .cmdlist = cmds,
+    .len = sizeof(cmds),
+    .retry = 3
+};
+
 static enum NetworkStatus nstatus = NETWORK_STATUS_NREADY;
 
 static QueueHandle_t LMQueue = NULL;
@@ -37,7 +104,7 @@ static int doNetworkResult = -1;
 
 static char rxbuf[1024] = {0};
 
-#define GPRS_MODULE_SEND(x) write(MODULE_NETWORK_DEV, x, strlen(x))
+#define GPRS_MODULE_SEND(x, y) write(MODULE_NETWORK_DEV, x, y)
 
 #define GPRS_MODULE_RECV(x) read(MODULE_NETWORK_DEV, x, 1024)
 
@@ -220,109 +287,40 @@ MODULE_INIT_DEFINE(Network)
 static int doNetworkSetup(void)
 {
     if (NETWORK_STATUS_NREADY == nstatus) {
-
         int len = 0;
+        int ll = -1;
+        int status = 0;
 
-        uint16_t retry = 0;
-
-        int status = 0, tmpstatus = 0;
-
-        GPRS_ModulePwron();
-
-        GPRS_MODULE_SEND("ATE0\r\n");
+        memset(rxbuf, 0, 1024);
 
         while (1) {
-            int ll = GPRS_MODULE_RECV(rxbuf + len);
-            if (-1 != ll) {
-                tmpstatus = status;
-                len += ll;
-                if (strchr(rxbuf, '\r') || strchr(rxbuf, '\n')) {
-                    switch (status) {
-                        case 0:
-                        {
-                            if (strstr(rxbuf, "OK")) {
-                                GPRS_MODULE_SEND("AT+CCID\r\n");
-                                status++;
-                            }
-                            else if (strstr(rxbuf, "ERROR")) {
-                                GPRS_MODULE_SEND("ATE0\r\n");
-                                retry++;
-                            }
-                        }
-                        break;
-                        case 1:
-                        {
-                            if (strstr(rxbuf, "OK")) {
-                                GPRS_MODULE_SEND("AT+CREG=2\r\n");
-                                status++;
-                            }
-                            else if (strstr(rxbuf, "ERROR")) {
-                                GPRS_MODULE_SEND("AT+CCID\r\n");
-                                retry++;
-                            }
-                        }
-                        break;
-                        case 2:
-                        {
-                            if (strstr(rxbuf, "OK")) {
-                                GPRS_MODULE_SEND("AT+CGATT=1\r\n");
-                                status++;
-                            }
-                            else if (strstr(rxbuf, "ERROR")) {
-                                GPRS_MODULE_SEND("AT+CREG=1\r\n");
-                                retry++;
-                            }
-                        }
-                        break;
-                        case 3:
-                        {
-                            if (strstr(rxbuf, "OK")) {
-                                GPRS_MODULE_SEND("AT+CGDCONT=1,\"IP\",\"CMNET\"\r\n");
-                                status++;
-                            }
-                            else if (strstr(rxbuf, "ERROR")) {
-                                GPRS_MODULE_SEND("AT+CGATT=1\r\n");
-                                retry++;
-                            }
-                        }
-                        break;
-                        case 4:
-                        {
-                            if (strstr(rxbuf, "OK")) {
-                                GPRS_MODULE_SEND("AT+CGACT=1,1\r\n");
-                                status++;
-                            }
-                            else if (strstr(rxbuf, "ERROR")) {
-                                GPRS_MODULE_SEND("AT+CGDCONT=1,\"IP\",\"CMNET\"\r\n");
-                                retry++;
-                            }
-                        }
-                        break;
-                        case 5:
-                        {
-                            if (strstr(rxbuf, "OK")) {
-                                nstatus = NETWORK_STATUS_DISCONNECTED;
-                                return 0;
-                            }
-                            else if (strstr(rxbuf, "ERROR")) {
-                                GPRS_MODULE_SEND("AT+CGACT=1,1\r\n");
-                                retry++;
-                            }
-                        }
-                        break;
-                        default:
-                        break;
-                    }
-                    memset(rxbuf, 0, 1024);
-                    len = 0;
+            int i;
+
+            vTaskDelay(dials.cmdlist[status].timeout / portTICK_PERIOD_MS);
+
+            GPRS_MODULE_SEND(dials.cmdlist[status].cmd, dials.cmdlist[status].len);
+
+            ll = GPRS_MODULE_RECV(rxbuf + len);
+            if (-1 == ll) {
+                continue;
+            }
+
+            for (i = 0; NULL != dials.abort[i]; i++) {
+                if (strstr(rxbuf, dials.abort[i])) {
+                    return -1;
                 }
             }
 
-            if (tmpstatus < status) {
-                retry = 0;
+            if (!strstr(rxbuf, dials.cmdlist[status].rsp)) {
+                return -1;
             }
-            else if (retry > RETRY_MAX) {
-                break;
+
+            if (status + 1 == dials.len) {
+                return 0;
+            }
+            else {
+                memset(rxbuf, 0, 1024);
+                status++;
             }
         }
     }
@@ -350,7 +348,7 @@ static int doNetworkConnect(const char *a, uint16_t p)
 
         snprintf(strbuf, 50, "AT+CIPSTART=\"TCP\",\"%s\",%d\r\n", a, p);
 
-        GPRS_MODULE_SEND(strbuf);
+        GPRS_MODULE_SEND(strbuf, strlen(strbuf));
 
         while (1) {
             int ll = GPRS_MODULE_RECV(rxbuf + len);
@@ -362,11 +360,11 @@ static int doNetworkConnect(const char *a, uint16_t p)
                         case 0:
                         {
                             if (strstr(rxbuf, "CONNECT OK")) {
-                                GPRS_MODULE_SEND("AT+CIPTMODE=1\r\n");
+                                GPRS_MODULE_SEND("AT+CIPTMODE=1\r\n", sizeof("AT+CIPTMODE=1\r\n") - 1);
                                 status++;
                             }
                             else if (strstr(rxbuf, "ERROR")) {
-                                GPRS_MODULE_SEND(strbuf);
+                                GPRS_MODULE_SEND(strbuf, strlen(strbuf));
                                 retry++;
                             }
                         }
@@ -378,7 +376,7 @@ static int doNetworkConnect(const char *a, uint16_t p)
                                 return 0;
                             }
                             else if (strstr(rxbuf, "ERROR")) {
-                                GPRS_MODULE_SEND("AT+CIPTMODE=1\r\n");
+                                GPRS_MODULE_SEND("AT+CIPTMODE=1\r\n", sizeof("AT+CIPTMODE=1\r\n") - 1);
                                 retry++;
                             }
                         }
@@ -411,7 +409,7 @@ static int doNetworkSubmit(const char *rq)
 {
     if (NETWORK_STATUS_CONNECTED == nstatus) {
         int ret = 0;
-        GPRS_MODULE_SEND(rq);
+        GPRS_MODULE_SEND(rq, strlen(rq));
         ret = GPRS_MODULE_RECV(rxbuf);
         if (-1 != ret) {
             rxbuf[ret] = '\0';
@@ -429,11 +427,11 @@ static int doNetworkShutdown(void)
 
         vTaskDelay(3000 / portTICK_PERIOD_MS);
 
-        GPRS_MODULE_SEND("+++");
+        GPRS_MODULE_SEND("+++", sizeof("+++") - 1);
 
         if (-1 != GPRS_MODULE_RECV(rxbuf)) {
             if (strstr(rxbuf, "OK")) {
-                GPRS_MODULE_SEND("AT+CIPCLOSE\r\n");
+                GPRS_MODULE_SEND("AT+CIPCLOSE\r\n", sizeof("AT+CIPCLOSE\r\n") - 1);
                 /* should not wait the reply:
                    now we can't detect the disconnect from server.
 
