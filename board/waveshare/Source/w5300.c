@@ -9,6 +9,7 @@
 static SRAM_HandleTypeDef SRAMHandle;
 static DMA_HandleTypeDef hdma_tx;
 static TaskHandle_t cur = NULL;
+static __IO uint8_t *current = NULL;
 static __IO uint16_t rxtxXferCount = 0;
 
 DEVICE_DEFINE(W5300, DEV_W5300_ID);
@@ -142,14 +143,14 @@ DEVICE_FUNC_DEFINE_WRITE(W5300)
 
     rxtxXferCount = len;
 
-    /*##-2- Start the transmission process #####################################*/  
+    /*##-2- Start the transmission process #####################################*/
     /* While the UART in reception process, user can transmit data through 
      "aTxBuffer" buffer */
-    // if(HAL_SRAM_Write_DMA(&SRAMHandle, NULL, buf, len) != HAL_OK) {
-    //     return -1;
-    // }
+    if(HAL_SRAM_Write_DMA(&SRAMHandle, (uint32_t *)current, (uint32_t *)buf, len) != HAL_OK) {
+        return -1;
+    }
 
-    /*##-3- Wait for the end of the transfer ###################################*/  
+    /*##-3- Wait for the end of the transfer ###################################*/
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
     if (!rxtxXferCount) {
@@ -164,10 +165,39 @@ DEVICE_FUNC_DEFINE_WRITE(W5300)
 
 DEVICE_FUNC_DEFINE_READ(W5300)
 {
+    if (!len) {
+        return -1;
+    }
 
+    cur = xTaskGetCurrentTaskHandle();
+
+    if (!cur) {
+        return -1;
+    }
+
+    rxtxXferCount = len;
+
+    xTaskNotifyStateClear(cur);
+
+    /*##-2- Start the transmission process #####################################*/
+    /* While the UART in reception process, user can transmit data through 
+     "aTxBuffer" buffer */
+    if(HAL_SRAM_Read_DMA(&SRAMHandle, (uint32_t *)current, (uint32_t *)buf, len) != HAL_OK) {
+        return -1;
+    }
+
+    /*##-3- Wait for the end of the transfer ###################################*/
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
+    if (!rxtxXferCount) {
+        return -1;
+    }
+    else {
+        return rxtxXferCount;
+    }
 }
 
 DEVICE_FUNC_DEFINE_LSEEK(W5300)
 {
-    
+    return -1;
 }

@@ -446,6 +446,13 @@ static int doNetworkShutdown(void)
 
 static void GPRS_ModulePwron(void)
 {
-    /* TODO: GPRS PWR */
+    uint8_t val = 1;
+
+    write(MODULE_NETWORK_PWD, &val, 1);
+
     vTaskDelay(3000 / portTICK_PERIOD_MS);
+
+    val = !val;
+
+    write(MODULE_NETWORK_PWD, &val, 1);
 }
