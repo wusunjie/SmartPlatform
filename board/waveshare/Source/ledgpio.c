@@ -13,12 +13,6 @@
 
 static void BSP_LED_Init(void);
 
-static void BSP_LED_On(void);
-
-static void BSP_LED_Off(void);
-
-static GPIO_PinState BSP_LED_Read(void);
-
 DEVICE_DEFINE(ledgpio_led, DEV_LEDGPIO_ID);
 
 static void BSP_LED_Init(void)
@@ -39,39 +33,6 @@ static void BSP_LED_Init(void)
     HAL_GPIO_WritePin(LED_GPIO_PORT, LED_PIN, GPIO_PIN_RESET);
 }
 
-/**
-  * @brief  Turns selected LED On.
-  * @param  Led: Specifies the Led to be set on. 
-  *   This parameter can be one of following parameters:
-  *     @arg LED4
-  *     @arg LED3
-  *     @arg LED5
-  *     @arg LED6  
-  */
-static void BSP_LED_On(void)
-{
-    HAL_GPIO_WritePin(LED_GPIO_PORT, LED_PIN, GPIO_PIN_SET);
-}
-
-/**
-  * @brief  Turns selected LED Off.
-  * @param  Led: Specifies the Led to be set off. 
-  *   This parameter can be one of following parameters:
-  *     @arg LED4
-  *     @arg LED3
-  *     @arg LED5
-  *     @arg LED6 
-  */
-static void BSP_LED_Off(void)
-{
-    HAL_GPIO_WritePin(LED_GPIO_PORT, LED_PIN, GPIO_PIN_RESET);
-}
-
-static GPIO_PinState BSP_LED_Read(void)
-{
-    return HAL_GPIO_ReadPin(LED_GPIO_PORT, LED_PIN);
-}
-
 DEVICE_FUNC_DEFINE_OPEN(ledgpio_led)
 {
     BSP_LED_Init();
@@ -79,6 +40,7 @@ DEVICE_FUNC_DEFINE_OPEN(ledgpio_led)
 
 DEVICE_FUNC_DEFINE_CLOSE(ledgpio_led)
 {
+    LED_GPIO_CLK_DISABLE();
 }
 
 DEVICE_FUNC_DEFINE_WRITE(ledgpio_led)
@@ -88,10 +50,10 @@ DEVICE_FUNC_DEFINE_WRITE(ledgpio_led)
     }
 
     if (buf[0]) {
-        BSP_LED_On();
+        HAL_GPIO_WritePin(LED_GPIO_PORT, LED_PIN, GPIO_PIN_SET);
     }
     else {
-        BSP_LED_Off();
+        HAL_GPIO_WritePin(LED_GPIO_PORT, LED_PIN, GPIO_PIN_RESET);
     }
 
     return 1;
@@ -102,7 +64,7 @@ DEVICE_FUNC_DEFINE_READ(ledgpio_led)
     if (len < 1) {
         return -1;
     }
-    if (GPIO_PIN_SET == BSP_LED_Read()) {
+    if (GPIO_PIN_SET == HAL_GPIO_ReadPin(LED_GPIO_PORT, LED_PIN)) {
         buf[0] = 1;
     }
     else {
