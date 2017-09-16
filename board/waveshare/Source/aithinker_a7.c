@@ -1,5 +1,6 @@
 #include "device.h"
 #include "boardcfg.h"
+#include "ioctl.h"
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 
@@ -42,11 +43,37 @@
 #define USARTx_IRQn                      USART2_IRQn
 #define USARTx_IRQHandler                USART2_IRQHandler
 
+#define LED_PIN                          GPIO_PIN_6
+#define LED_GPIO_PORT                    GPIOF
+#define LED_GPIO_CLK_ENABLE()            __HAL_RCC_GPIOF_CLK_ENABLE()
+#define LED_GPIO_CLK_DISABLE()           __HAL_RCC_GPIOF_CLK_DISABLE()
+
+static void BSP_LED_Init(void);
+
+
 static UART_HandleTypeDef UartHandle;
 static DMA_HandleTypeDef hdma_tx;
 static DMA_HandleTypeDef hdma_rx;
 static TaskHandle_t cur = NULL;
 static __IO uint16_t rxtxXferCount = 0;
+
+static void BSP_LED_Init(void)
+{
+    GPIO_InitTypeDef  GPIO_InitStruct;
+
+    /* Enable the GPIO_LED Clock */
+    LED_GPIO_CLK_ENABLE();
+
+    /* Configure the GPIO_LED pin */
+    GPIO_InitStruct.Pin = LED_PIN;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
+
+    HAL_GPIO_Init(LED_GPIO_PORT, &GPIO_InitStruct);
+
+    HAL_GPIO_WritePin(LED_GPIO_PORT, LED_PIN, GPIO_PIN_RESET);
+}
 
 DEVICE_DEFINE(AiThinkerA7, DEV_AITHINKER_A7_ID);
 
@@ -195,11 +222,14 @@ DEVICE_FUNC_DEFINE_OPEN(AiThinkerA7)
     UartHandle.Init.OverSampling = UART_OVERSAMPLING_16;
 
     HAL_UART_Init(&UartHandle);
+
+    BSP_LED_Init();
 }
 
 DEVICE_FUNC_DEFINE_CLOSE(AiThinkerA7)
 {
     HAL_UART_DeInit(&UartHandle);
+    LED_GPIO_CLK_DISABLE();
 }
 
 DEVICE_FUNC_DEFINE_WRITE(AiThinkerA7)
@@ -274,6 +304,23 @@ DEVICE_FUNC_DEFINE_READ(AiThinkerA7)
 
 DEVICE_FUNC_DEFINE_LSEEK(AiThinkerA7)
 {
+    return -1;
+}
+
+DEVICE_FUNC_DEFINE_IOCTL(AiThinkerA7)
+{
+    switch (request) {
+        case IOCTL_REQ_GPRS_PWR_ON:
+        {
+            HAL_GPIO_WritePin(LED_GPIO_PORT, LED_PIN, GPIO_PIN_SET);
+            vTaskDelay(3000 / portTICK_PERIOD_MS);
+            HAL_GPIO_WritePin(LED_GPIO_PORT, LED_PIN, GPIO_PIN_RESET);
+            return 0;
+        }
+        break;
+        default:
+        break;
+    }
     return -1;
 }
 

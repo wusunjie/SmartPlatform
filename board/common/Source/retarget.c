@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
+#include <stdarg.h>
 
 #include "device.h"
 
@@ -97,4 +98,24 @@ int _lseek(int file, int ptr, int dir)
     }
 
     return -1;
+}
+
+int ioctl(int file, int request, ...)
+{
+    int i;
+    va_list ap;
+    int res = -1;
+
+    for (i = 0; i < (__device_list_end - __device_list_begin); i++) {
+        if (file == __device_list_begin[i]->id) {
+            if (__device_list_begin[i]->opt.ioctl) {
+                va_start(ap, request);
+                res = __device_list_begin[i]->opt.ioctl(request, va_arg(ap, void *));
+                va_end(ap);
+            }
+            break;
+        }
+    }
+
+    return res;
 }

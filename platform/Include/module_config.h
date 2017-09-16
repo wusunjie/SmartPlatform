@@ -4,6 +4,5 @@
 #include "boardcfg.h"
 
 #define MODULE_NETWORK_DEV   DEV_AITHINKER_A7_ID
-#define MODULE_NETWORK_PWD   DEV_LEDGPIO_ID
 
 #endif

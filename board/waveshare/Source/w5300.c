@@ -201,3 +201,8 @@ DEVICE_FUNC_DEFINE_LSEEK(W5300)
 {
     return -1;
 }
+
+DEVICE_FUNC_DEFINE_IOCTL(W5300)
+{
+    return -1;
+}

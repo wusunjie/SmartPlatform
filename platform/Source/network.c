@@ -2,6 +2,8 @@
 #include <unistd.h>
 #include <stdio.h>
 
+#include "ioctl.h"
+
 #include "module_config.h"
 #include "module.h"
 #include "network.h"
@@ -113,8 +115,6 @@ static int doNetworkConnect(const char *a, uint16_t p);
 static int doNetworkSubmit(const char *rq);
 
 static int doNetworkShutdown(void);
-
-static void GPRS_ModulePwron(void);
 
 int NetworkSetup(void)
 {
@@ -287,6 +287,8 @@ static int doNetworkSetup(void)
 
         memset(rxbuf, 0, 1024);
 
+        ioctl(MODULE_NETWORK_DEV, IOCTL_REQ_GPRS_PWR_ON);
+
         while (1) {
             int i;
 
@@ -426,17 +428,4 @@ static int doNetworkShutdown(void)
     }
 
     return 0;
-}
-
-static void GPRS_ModulePwron(void)
-{
-    uint8_t val = 1;
-
-    write(MODULE_NETWORK_PWD, &val, 1);
-
-    vTaskDelay(3000 / portTICK_PERIOD_MS);
-
-    val = !val;
-
-    write(MODULE_NETWORK_PWD, &val, 1);
 }

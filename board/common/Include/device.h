@@ -7,6 +7,7 @@ struct devopt {
     int (*read)(char *buf, int len);
     int (*write)(char *buf, int len);
     int (*lseek)(int ptr, int dir);
+    int (*ioctl)(int request, void *args);
 };
 
 struct device {
@@ -20,6 +21,7 @@ struct device {
     static int DEV##_write(char *buf, int len);                     \
     static int DEV##_read(char *buf, int len);                      \
     static int DEV##_lseek(int ptr, int dir);                       \
+    static int DEV##_ioctl(int request, void *args);                \
     static struct device DEV = {                                    \
       .id = ID,                                                     \
       .opt.open = DEV##_open,                                       \
@@ -27,6 +29,7 @@ struct device {
       .opt.read = DEV##_read,                                       \
       .opt.write = DEV##_write,                                     \
       .opt.lseek = DEV##_lseek,                                     \
+      .opt.ioctl = DEV##_ioctl,                                     \
     };                                                              \
     static const struct device *DEV##_dev __attribute__((__used__)) \
     __attribute__((section(".device"))) = &DEV
@@ -42,6 +45,8 @@ struct device {
     static int DEV##_read(char *buf, int len)
 #define DEVICE_FUNC_DEFINE_LSEEK(DEV) \
     static int DEV##_lseek(int ptr, int dir)
+#define DEVICE_FUNC_DEFINE_IOCTL(DEV) \
+    static int DEV##_ioctl(int request, void *args)
 
 extern void device_open(void);
 

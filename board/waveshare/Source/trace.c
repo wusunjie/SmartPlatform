@@ -51,3 +51,8 @@ DEVICE_FUNC_DEFINE_LSEEK(trace)
 {
     return -1;
 }
+
+DEVICE_FUNC_DEFINE_IOCTL(trace)
+{
+    return -1;
+}
