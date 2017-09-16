@@ -12,8 +12,6 @@
 #include "event_groups.h"
 #include "queue.h"
 
-#define RETRY_MAX     3
-
 #define BIT_SETUP     ( 1 << 0 )
 #define BIT_CONNECT   ( 1 << 1 )
 #define BIT_SUBMIT    ( 1 << 2 )
