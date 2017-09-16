@@ -46,3 +46,8 @@ DEVICE_FUNC_DEFINE_READ(trace)
 {
     return -1;
 }
+
+DEVICE_FUNC_DEFINE_LSEEK(trace)
+{
+    return -1;
+}

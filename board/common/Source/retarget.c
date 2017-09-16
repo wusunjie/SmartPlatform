@@ -82,3 +82,19 @@ caddr_t _sbrk(int incr)
 
     return (caddr_t) prev_heap_end;
 }
+
+int _lseek(int file, int ptr, int dir)
+{
+    int i;
+
+    for (i = 0; i < (__device_list_end - __device_list_begin); i++) {
+        if (file == __device_list_begin[i]->id) {
+            if (__device_list_begin[i]->opt.lseek) {
+                return __device_list_begin[i]->opt.lseek(ptr, dir);
+            }
+            break;
+        }
+    }
+
+    return -1;
+}

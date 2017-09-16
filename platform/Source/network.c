@@ -118,8 +118,6 @@ static int doNetworkShutdown(void);
 
 static void GPRS_ModulePwron(void);
 
-static void GPRS_ModuleBlink(void);
-
 int NetworkSetup(void)
 {
     uint16_t type = 0;
@@ -212,8 +210,6 @@ MODULE_DEFINE(Network, 1024, 2)
     uint16_t pxRxedMessage;
 
     while (1) {
-
-        GPRS_ModuleBlink();
 
         if( xQueueReceive( LMQueue, &( pxRxedMessage ), ( TickType_t ) portMAX_DELAY ) ) {
             switch (pxRxedMessage) {
@@ -450,19 +446,6 @@ static int doNetworkShutdown(void)
 
 static void GPRS_ModulePwron(void)
 {
-    char val = 1;
-
-    write(MODULE_NETWORK_PWR, &val, 1);
-
+    /* TODO: GPRS PWR */
     vTaskDelay(3000 / portTICK_PERIOD_MS);
-
-    val = 0;
-    write(MODULE_NETWORK_PWR, &val, 1);
-}
-
-static void GPRS_ModuleBlink(void)
-{
-    static int val = 0;
-    write(MODULE_NETWORK_BLINK, &val, 1);
-    val = !val;
 }

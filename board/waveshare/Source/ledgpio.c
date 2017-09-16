@@ -39,14 +39,6 @@
                                             if((__INDEX__) == 3) LED6_GPIO_CLK_DISABLE(); \
                                             }while(0)
 
-typedef enum
-{
-    LED4 = 0,
-    LED3 = 1,
-    LED5 = 2,
-    LED6 = 3
-} Led_TypeDef;
-
 GPIO_TypeDef* GPIO_PORT[LEDn] = {LED4_GPIO_PORT,
                                  LED3_GPIO_PORT,
                                  LED5_GPIO_PORT,
@@ -56,18 +48,17 @@ static const uint16_t GPIO_PIN[LEDn] = {LED4_PIN,
                                  LED5_PIN,
                                  LED6_PIN};
 
-static void BSP_LED_Init(Led_TypeDef Led);
+static int current = 0;
 
-static void BSP_LED_On(Led_TypeDef Led);
+static void BSP_LED_Init(int Led);
 
-static void BSP_LED_Off(Led_TypeDef Led);
+static void BSP_LED_On(int Led);
 
-static GPIO_PinState BSP_LED_Read(Led_TypeDef led);
+static void BSP_LED_Off(int Led);
 
-DEVICE_DEFINE(ledgpio_led4, DEV_LEDGPIO1_ID);
-DEVICE_DEFINE(ledgpio_led3, DEV_LEDGPIO2_ID);
-DEVICE_DEFINE(ledgpio_led5, DEV_LEDGPIO3_ID);
-DEVICE_DEFINE(ledgpio_led6, DEV_LEDGPIO4_ID);
+static GPIO_PinState BSP_LED_Read(int led);
+
+DEVICE_DEFINE(ledgpio_led, DEV_LEDGPIO_ID);
 
 /**
   * @brief  Configures LED GPIO.
@@ -78,7 +69,7 @@ DEVICE_DEFINE(ledgpio_led6, DEV_LEDGPIO4_ID);
   *     @arg LED5
   *     @arg LED6
   */
-static void BSP_LED_Init(Led_TypeDef Led)
+static void BSP_LED_Init(int Led)
 {
     GPIO_InitTypeDef  GPIO_InitStruct;
 
@@ -105,7 +96,7 @@ static void BSP_LED_Init(Led_TypeDef Led)
   *     @arg LED5
   *     @arg LED6  
   */
-static void BSP_LED_On(Led_TypeDef Led)
+static void BSP_LED_On(int Led)
 {
     HAL_GPIO_WritePin(GPIO_PORT[Led], GPIO_PIN[Led], GPIO_PIN_SET);
 }
@@ -119,47 +110,50 @@ static void BSP_LED_On(Led_TypeDef Led)
   *     @arg LED5
   *     @arg LED6 
   */
-static void BSP_LED_Off(Led_TypeDef Led)
+static void BSP_LED_Off(int Led)
 {
     HAL_GPIO_WritePin(GPIO_PORT[Led], GPIO_PIN[Led], GPIO_PIN_RESET);
 }
 
-static GPIO_PinState BSP_LED_Read(Led_TypeDef Led)
+static GPIO_PinState BSP_LED_Read(int Led)
 {
     return HAL_GPIO_ReadPin(GPIO_PORT[Led], GPIO_PIN[Led]);
 }
 
-DEVICE_FUNC_DEFINE_OPEN(ledgpio_led4)
+DEVICE_FUNC_DEFINE_OPEN(ledgpio_led)
 {
-    BSP_LED_Init(LED4);
+    BSP_LED_Init(0);
+    BSP_LED_Init(1);
+    BSP_LED_Init(2);
+    BSP_LED_Init(3);
 }
 
-DEVICE_FUNC_DEFINE_CLOSE(ledgpio_led4)
+DEVICE_FUNC_DEFINE_CLOSE(ledgpio_led)
 {
 }
 
-DEVICE_FUNC_DEFINE_WRITE(ledgpio_led4)
+DEVICE_FUNC_DEFINE_WRITE(ledgpio_led)
 {
     if (len < 1) {
         return -1;
     }
 
     if (buf[0]) {
-        BSP_LED_On(LED4);
+        BSP_LED_On(current);
     }
     else {
-        BSP_LED_Off(LED4);
+        BSP_LED_Off(current);
     }
 
     return 1;
 }
 
-DEVICE_FUNC_DEFINE_READ(ledgpio_led4)
+DEVICE_FUNC_DEFINE_READ(ledgpio_led)
 {
     if (len < 1) {
         return -1;
     }
-    if (GPIO_PIN_SET == BSP_LED_Read(LED4)) {
+    if (GPIO_PIN_SET == BSP_LED_Read(current)) {
         buf[0] = 1;
     }
     else {
@@ -169,122 +163,18 @@ DEVICE_FUNC_DEFINE_READ(ledgpio_led4)
     return 1;
 }
 
-DEVICE_FUNC_DEFINE_OPEN(ledgpio_led3)
+DEVICE_FUNC_DEFINE_LSEEK(ledgpio_led)
 {
-    BSP_LED_Init(LED3);
-}
-
-DEVICE_FUNC_DEFINE_CLOSE(ledgpio_led3)
-{
-}
-
-DEVICE_FUNC_DEFINE_WRITE(ledgpio_led3)
-{
-    if (len < 1) {
-        return -1;
+    switch (dir)
+    {
+        case SEEK_SET:
+        {
+            current = ptr;
+            return 0;
+        }
+        break;
+        default:
+        break;
     }
-
-    if (buf[0]) {
-        BSP_LED_On(LED3);
-    }
-    else {
-        BSP_LED_Off(LED3);
-    }
-
-    return 1;
-}
-
-DEVICE_FUNC_DEFINE_READ(ledgpio_led3)
-{
-    if (len < 1) {
-        return -1;
-    }
-    if (GPIO_PIN_SET == BSP_LED_Read(LED3)) {
-        buf[0] = 1;
-    }
-    else {
-        buf[0] = 0;
-    }
-
-    return 1;
-}
-
-DEVICE_FUNC_DEFINE_OPEN(ledgpio_led5)
-{
-    BSP_LED_Init(LED5);
-}
-
-DEVICE_FUNC_DEFINE_CLOSE(ledgpio_led5)
-{
-}
-
-DEVICE_FUNC_DEFINE_WRITE(ledgpio_led5)
-{
-    if (len < 1) {
-        return -1;
-    }
-
-    if (buf[0]) {
-        BSP_LED_On(LED5);
-    }
-    else {
-        BSP_LED_Off(LED5);
-    }
-
-    return 1;
-}
-
-DEVICE_FUNC_DEFINE_READ(ledgpio_led5)
-{
-    if (len < 1) {
-        return -1;
-    }
-    if (GPIO_PIN_SET == BSP_LED_Read(LED5)) {
-        buf[0] = 1;
-    }
-    else {
-        buf[0] = 0;
-    }
-
-    return 1;
-}
-
-DEVICE_FUNC_DEFINE_OPEN(ledgpio_led6)
-{
-    BSP_LED_Init(LED6);
-}
-
-DEVICE_FUNC_DEFINE_CLOSE(ledgpio_led6)
-{
-}
-
-DEVICE_FUNC_DEFINE_WRITE(ledgpio_led6)
-{
-    if (len < 1) {
-        return -1;
-    }
-
-    if (buf[0]) {
-        BSP_LED_On(LED6);
-    }
-    else {
-        BSP_LED_Off(LED6);
-    }
-
-    return 1;
-}
-
-DEVICE_FUNC_DEFINE_READ(ledgpio_led6)
-{
-    if (len < 1) {
-        return -1;
-    }
-    if (GPIO_PIN_SET == BSP_LED_Read(LED6)) {
-        buf[0] = 1;
-    }
-    else {
-        buf[0] = 0;
-    }
-
-    return 1;
+    return -1;
 }

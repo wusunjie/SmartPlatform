@@ -11,14 +11,7 @@
 extern struct module *__module_list_begin[];
 extern struct module *__module_list_end[];
 
-static void AppTimerCallback( TimerHandle_t xTimer );
 static void module_init(void);
-static void SystemLEDBlink(void);
-
-static void AppTimerCallback( TimerHandle_t xTimer )
-{
-    SystemLEDBlink();
-}
 
 static void module_init(void)
 {
@@ -40,33 +33,13 @@ static void module_init(void)
 
 int main(void)
 {
-    static TimerHandle_t timer;
-
-    static StaticTimer_t BlinkTimer;
-
     system_init();
 
     module_init();
 
-    timer = xTimerCreateStatic("BlinkTimer", 1000 / portTICK_PERIOD_MS, pdTRUE, NULL, AppTimerCallback, &BlinkTimer);
-
-    if (timer) {
-        xTimerStart(timer, 0);
-        vTaskStartScheduler();
-    }
+    vTaskStartScheduler();
 
     while (1);
 
     return 0;
-}
-
-static void SystemLEDBlink(void)
-{
-    static char val = 0;
-
-    write(MODULE_SYSTEM_BLINK1, &val, 1);
-
-    write(MODULE_SYSTEM_BLINK2, &val, 1);
-
-    val = !val;
 }
