@@ -145,7 +145,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
     /* NVIC configuration for USART TC interrupt */
     HAL_NVIC_SetPriority(USARTx_IRQn, 0, 0);
-    __HAL_UART_ENABLE_IT(&UartHandle, UART_IT_IDLE);
+    __HAL_UART_ENABLE_IT(huart, UART_IT_IDLE);
     HAL_NVIC_EnableIRQ(USARTx_IRQn);
 }
 
@@ -182,6 +182,8 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
 
 DEVICE_FUNC_DEFINE_OPEN(AiThinkerA7)
 {
+    __HAL_UART_RESET_HANDLE_STATE(&UartHandle);
+
     UartHandle.Instance          = USARTx;
 
     UartHandle.Init.BaudRate     = 115200;
