@@ -34,7 +34,6 @@ struct dialchart {
     const char *abort[10];
     struct gprscmd *cmdlist;
     uint16_t len;
-    uint16_t retry;
 };
 
 static struct gprscmd cmds[] = {
@@ -87,7 +86,6 @@ static struct dialchart dials = {
     },
     .cmdlist = cmds,
     .len = sizeof(cmds),
-    .retry = 3
 };
 
 static enum NetworkStatus nstatus = NETWORK_STATUS_NREADY;
@@ -338,10 +336,6 @@ static int doNetworkConnect(const char *a, uint16_t p)
 
         static char strbuf[50] = {0};
 
-        uint16_t retry = 0;
-
-        int tmpstatus = status;
-
         snprintf(strbuf, 50, "AT+CIPSTART=\"TCP\",\"%s\",%d\r\n", a, p);
 
         GPRS_MODULE_SEND(strbuf, strlen(strbuf));
@@ -349,7 +343,6 @@ static int doNetworkConnect(const char *a, uint16_t p)
         while (1) {
             int ll = GPRS_MODULE_RECV(rxbuf + len);
             if (-1 != ll) {
-                tmpstatus = status;
                 len += ll;
                 if (strchr(rxbuf, '\r') || strchr(rxbuf, '\n')) {
                     switch (status) {
@@ -359,9 +352,8 @@ static int doNetworkConnect(const char *a, uint16_t p)
                                 GPRS_MODULE_SEND("AT+CIPTMODE=1\r\n", sizeof("AT+CIPTMODE=1\r\n") - 1);
                                 status++;
                             }
-                            else if (strstr(rxbuf, "ERROR")) {
-                                GPRS_MODULE_SEND(strbuf, strlen(strbuf));
-                                retry++;
+                            else {
+                                return -1;
                             }
                         }
                         break;
@@ -371,9 +363,8 @@ static int doNetworkConnect(const char *a, uint16_t p)
                                 nstatus = NETWORK_STATUS_CONNECTED;
                                 return 0;
                             }
-                            else if (strstr(rxbuf, "ERROR")) {
-                                GPRS_MODULE_SEND("AT+CIPTMODE=1\r\n", sizeof("AT+CIPTMODE=1\r\n") - 1);
-                                retry++;
+                            else {
+                                return -1;
                             }
                         }
                         break;
@@ -382,13 +373,6 @@ static int doNetworkConnect(const char *a, uint16_t p)
                     }
                     memset(rxbuf, 0, 1024);
                     len = 0;
-                }
-
-                if (tmpstatus < status) {
-                    retry = 0;
-                }
-                else if (retry > RETRY_MAX) {
-                    break;
                 }
             }
         }
