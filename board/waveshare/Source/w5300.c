@@ -72,7 +72,7 @@ void HAL_SRAM_MspDeInit(SRAM_HandleTypeDef *hsram)
   */
 void HAL_SRAM_DMA_XferCpltCallback(DMA_HandleTypeDef *hdma)
 {
-
+    vTaskNotifyGiveFromISR(cur, NULL);
 }
 
 /**
@@ -83,7 +83,8 @@ void HAL_SRAM_DMA_XferCpltCallback(DMA_HandleTypeDef *hdma)
   */
 void HAL_SRAM_DMA_XferErrorCallback(DMA_HandleTypeDef *hdma)
 {
-
+    rxtxXferCount = 0;
+    vTaskNotifyGiveFromISR(cur, NULL);
 }
 
 void DMA2_Stream0_IRQHandler(void)

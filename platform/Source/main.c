@@ -37,6 +37,8 @@ int main(void)
 
     module_init();
 
+    write(STDOUT_FILENO, "Hello World\n", sizeof("Hello World\n") - 1);
+
     vTaskStartScheduler();
 
     while (1);
