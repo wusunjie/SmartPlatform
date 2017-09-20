@@ -9,11 +9,11 @@
 
 ### Windows:
 
-1. download toolchain from [This link](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads)
+1. download toolchain from [gcc-arm-none-eabi](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads)
 
 2. install it on your system.
 
-3. download cmake from [This link](https://cmake.org/download)
+3. download cmake from [cmake](https://cmake.org/download)
 
 4. install it on your system.
 
