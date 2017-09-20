@@ -4,7 +4,6 @@
 
 #include "ioctl.h"
 
-#include "module_config.h"
 #include "module.h"
 #include "network.h"
 

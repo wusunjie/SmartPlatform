@@ -1,6 +1,5 @@
 #include "system.h"
 
-#include "module_config.h"
 #include "module.h"
 
 #include "FreeRTOS.h"

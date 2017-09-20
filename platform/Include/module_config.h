@@ -1,8 +1,0 @@
-#ifndef _SMART_PLATFORM_MODULE_CONFIG_H
-#define _SMART_PLATFORM_MODULE_CONFIG_H
-
-#include "boardcfg.h"
-
-#define MODULE_NETWORK_DEV   DEV_AITHINKER_A7_ID
-
-#endif

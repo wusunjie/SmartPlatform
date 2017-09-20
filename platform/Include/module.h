@@ -3,6 +3,10 @@
 
 #include "FreeRTOS.h"
 
+#include "boardcfg.h"
+
+#define MODULE_NETWORK_DEV   DEV_AITHINKER_A7_ID
+
 typedef void (*PlatformModuleTask)( void *args );
 typedef void (*PlatformModuleInit)( void );
 
