@@ -9,15 +9,11 @@
 
 ### Windows:
 
-1. download [gcc-arm-none-eabi](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads)
+1. download [gcc-arm-none-eabi](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads) and install it.
 
-2. install it on your system.
+2. download [cmake](https://cmake.org/download) and install it.
 
-3. download [cmake](https://cmake.org/download)
-
-4. install it on your system.
-
-5. make sure there is at least a local build system on your platform, such as Visual Studio, Mingw, nmake.
+3. make sure there is at least a local build system on your platform, such as Visual Studio, Mingw, nmake.
 
 ## build
 
