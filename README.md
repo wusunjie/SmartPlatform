@@ -7,13 +7,13 @@
 
 ## build
 
-###Linux:
+### Linux:
 
 1. export ARM_NONE_EABI_HOME=/usr.
 
 2. make BOARD_NAME=waveshare.
 
-###Windows:
+### Windows:
 
 1. Set environment variable ARM_NONE_EABI_HOME=<gcc-arm-none-eabi install path>.
 
