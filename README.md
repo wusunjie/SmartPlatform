@@ -19,17 +19,13 @@
 
 ### Linux:
 
-1. export ARM_NONE_EABI_HOME=/usr.
-
-2. make BOARD_NAME=waveshare.
+1. make BOARD_NAME=waveshare.
 
 ### Windows:
 
-1. Set environment variable ARM_NONE_EABI_HOME=toolchain install path.
+1. Use CMake GUI, set the source directory to cmake, then choose your prefer build system.
 
-For example: C:/GNU_Tools_ARM_Embedded/6_2017_q2_update
-
-2. Use CMake GUI, set the source directory to cmake, then choose your prefer build system.
+2. add macro define in CMake GUI for STM32_PLATFORM_BOARD_NAME to your board name, such as waveshare.
 
 3. Use your build system to open the project, then build in it.
 

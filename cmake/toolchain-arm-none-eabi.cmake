@@ -13,9 +13,6 @@ SET(CMAKE_CXX_COMPILER arm-none-eabi-g++${TOOLCHAIN_SUFFIX})
 SET(OBJ_COPY arm-none-eabi-objcopy${TOOLCHAIN_SUFFIX})
 SET(OBJ_SIZE arm-none-eabi-size${TOOLCHAIN_SUFFIX})
 
-# where is the target environment 
-SET(CMAKE_FIND_ROOT_PATH ${ARM_NONE_EABI_HOME}/lib/gcc/arm-none-eabi)
-
 # search for programs in the build host directories
 SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 # for libraries and headers in the target directories
