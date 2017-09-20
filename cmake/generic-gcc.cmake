@@ -22,11 +22,11 @@ INCLUDE_DIRECTORIES(${SMART_PLATFORM_TOP}/board/common/Include)
 AUX_SOURCE_DIRECTORY(${SMART_PLATFORM_TOP}/board/common/Source SRC_LIST)
 
 INCLUDE(${SMART_PLATFORM_TOP}/cmake/rtos-freertos.cmake)
-SET(LINK_SCRIPT ${SMART_PLATFORM_TOP}/board/${STM32_PLATFORM_BOARD_NAME}/Script/freertos.ld)
+SET(LINK_SCRIPT ${SMART_PLATFORM_TOP}/board/${SMART_PLATFORM_BOARD_NAME}/Script/freertos.ld)
 
 # INCLUDE(${SMART_PLATFORM_TOP}/cmake/lwip.cmake)
 
-SET(CMAKE_EXE_LINKER_FLAGS "-L${SMART_PLATFORM_TOP} -Wl,--gc-sections -Wl,--no-wchar-size-warning -Wl,-Map,${STM32_PLATFORM_BOARD_NAME}.map --specs=nano.specs --specs=nosys.specs -T${LINK_SCRIPT}" CACHE INTERNAL "" FORCE)
+SET(CMAKE_EXE_LINKER_FLAGS "-L${SMART_PLATFORM_TOP} -Wl,--gc-sections -Wl,--no-wchar-size-warning -Wl,-Map,${SMART_PLATFORM_BOARD_NAME}.map --specs=nano.specs --specs=nosys.specs -T${LINK_SCRIPT}" CACHE INTERNAL "" FORCE)
 SET(CMAKE_C_FLAGS "${ARCH_FLAGS} ${STARTUP_DEFS} -g -Os -flto -ffunction-sections -fdata-sections" CACHE INTERNAL "" FORCE)
 
 # post-process elf files into .hex files:

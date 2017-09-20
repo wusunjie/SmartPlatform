@@ -4,7 +4,7 @@
 all: Platform
 
 Platform:
-	cmake -DSTM32_PLATFORM_BOARD_NAME=$(BOARD_NAME) cmake -Bout
+	cmake -DSMART_PLATFORM_BOARD_NAME=$(BOARD_NAME) cmake -Bout
 	make -C out
 
 clean:

@@ -25,7 +25,7 @@
 
 1. Use CMake GUI, set the source directory to cmake, then choose your prefer build system.
 
-2. add macro define in CMake GUI for STM32_PLATFORM_BOARD_NAME to your board name, such as waveshare.
+2. add macro define in CMake GUI for SMART_PLATFORM_BOARD_NAME to your board name, such as waveshare.
 
 3. Use your build system to open the project, then build in it.
 
