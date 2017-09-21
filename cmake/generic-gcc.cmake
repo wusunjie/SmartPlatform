@@ -27,7 +27,8 @@ SET(LINK_SCRIPT ${SMART_PLATFORM_TOP}/board/${SMART_PLATFORM_BOARD_NAME}/Script/
 # INCLUDE(${SMART_PLATFORM_TOP}/cmake/lwip.cmake)
 
 SET(CMAKE_EXE_LINKER_FLAGS "-L${SMART_PLATFORM_TOP} -Wl,--gc-sections -Wl,--no-wchar-size-warning -Wl,-Map,${SMART_PLATFORM_BOARD_NAME}.map --specs=nano.specs --specs=nosys.specs -T${LINK_SCRIPT}" CACHE INTERNAL "" FORCE)
-SET(CMAKE_C_FLAGS "${ARCH_FLAGS} ${STARTUP_DEFS} -g -Os -flto -ffunction-sections -fdata-sections" CACHE INTERNAL "" FORCE)
+SET(CMAKE_C_FLAGS_RELEASE "${ARCH_FLAGS} -Os -flto -ffunction-sections -fdata-sections" CACHE INTERNAL "" FORCE)
+SET(CMAKE_C_FLAGS_DEBUG "${ARCH_FLAGS} -g -ffunction-sections -fdata-sections" CACHE INTERNAL "" FORCE)
 
 # post-process elf files into .hex files:
 FUNCTION(CREATE_IMAGE target_name)
