@@ -395,6 +395,7 @@ PRIVILEGED_DATA static List_t xPendingReadyList;						/*< Tasks that have been r
 /* Other file private variables. --------------------------------*/
 PRIVILEGED_DATA static volatile UBaseType_t uxCurrentNumberOfTasks 	= ( UBaseType_t ) 0U;
 PRIVILEGED_DATA static volatile TickType_t xTickCount 				= ( TickType_t ) 0U;
+PRIVILEGED_DATA static volatile portBASE_TYPE uxTopUsedPriority     = tskIDLE_PRIORITY;
 PRIVILEGED_DATA static volatile UBaseType_t uxTopReadyPriority 		= tskIDLE_PRIORITY;
 PRIVILEGED_DATA static volatile BaseType_t xSchedulerRunning 		= pdFALSE;
 PRIVILEGED_DATA static volatile UBaseType_t uxPendedTicks 			= ( UBaseType_t ) 0U;
@@ -1012,6 +1013,14 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB )
 		}
 
 		uxTaskNumber++;
+
+        /* Patch for openocd freertos support */
+		#if ( configUSE_TRACE_FACILITY == 1 ) 
+        if ( pxNewTCB->uxPriority > uxTopUsedPriority ) 
+        { 
+            uxTopUsedPriority = pxNewTCB->uxPriority; 
+        } 
+        #endif /* configUSE_TRACE_FACILITY */
 
 		#if ( configUSE_TRACE_FACILITY == 1 )
 		{
